@@ -1,0 +1,256 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  ADMIN
+  EDITOR
+  AUTHOR
+  CONTRIBUTOR
+  VIEWER
+  SUBSCRIBER
+}
+
+enum PostStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+// ============================================
+// AUTH MODELS (NextAuth.js)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?   // For email/password auth
+  image         String?
+  bio           String?
+  
+  // Role & Permissions
+  role          Role      @default(SUBSCRIBER)
+  
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]          @relation("Author")
+  comments      Comment[]
+  media         Media[]
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// CONTENT MODELS
+// ============================================
+
+model Post {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  description String?
+  content     String    @db.Text
+  status      PostStatus @default(DRAFT)
+  
+  // Authorship & Publishing
+  authorId    String
+  author      User      @relation("Author", fields: [authorId], references: [id], onDelete: Cascade)
+  publishedAt DateTime?
+  
+  // Media & Classification
+  featuredImage String?  // URL or mediaId reference
+  categories  Category[] @relation("PostCategories")
+  tags        Tag[]      @relation("PostTags")
+  media       Media[]    @relation("PostMedia")
+  
+  // Engagement
+  comments    Comment[]
+  viewCount   Int       @default(0)
+  
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt])
+  @@fulltext([title, description, content]) // For full-text search
+}
+
+model Comment {
+  id        String         @id @default(cuid())
+  content   String         @db.Text
+  status    CommentStatus  @default(PENDING)
+  
+  // Relations
+  postId    String
+  post      Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Threading (for nested comments)
+  parentId  String?
+  parent    Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]      @relation("CommentReplies")
+  
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([status])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  color       String?   // For UI purposes
+  
+  posts       Post[]    @relation("PostCategories")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  
+  posts     Post[]    @relation("PostTags")
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  filename  String
+  url       String
+  type      MediaType
+  mimeType  String
+  size      Int       // in bytes
+  
+  // Metadata
+  alt       String?
+  width     Int?
+  height    Int?
+  
+  // Relations
+  uploadedBy String
+  user      User      @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  
+  posts     Post[]    @relation("PostMedia")
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([uploadedBy])
+  @@index([type])
+}
+
+// ============================================
+// OPTIONAL: ADVANCED RBAC (if you, scale further)
+// ============================================
+
+model Permission {
+  id          String    @id @default(cuid())
+  name        String    @unique  // e.g., "post:create", "post:publish"
+  description String?
+  
+  roles       RolePermission[]
+  
+  createdAt   DateTime  @default(now())
+}
+
+model RolePermission {
+  roleId        Role       @id
+  permissionId  String
+  
+  role          Role       @relation(fields: [roleId], references: [id])
+  permission    Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
