@@ -1,14 +1,13 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
 
 const Card = () => {
   const [tilt, setTilt] = React.useState({ x: 0, y: 0 });
 
   const threshold = 12;
 
-  const handleMove = (e) => {
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } =
       e.currentTarget.getBoundingClientRect();
 

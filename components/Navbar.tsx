@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import React from "react";
 
 const Navbar = () => {
@@ -8,7 +7,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [input, setInput] = React.useState('');
 
-  const onSubmitHandler = async (e) => {
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 
