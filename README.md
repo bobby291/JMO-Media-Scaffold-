@@ -1,25 +1,79 @@
 # JMO Media Mini Fullstack
 
-Backend-first MVP for a media platform using Next.js App Router, Prisma, Neon/Postgres, and NextAuth.
+JMO Media is a Next.js mini fullstack media platform for structured articles,
+development content, community signups, role-aware publishing, and comments.
+
+The frontend follows the supplied `JMO Media UI_UX Design.make` direction:
+purple/black primary branding, gold CTAs, development-area cards, featured
+content, trending posts, email signup, ecosystem CTA, footer, and a light/dark
+screen toggle.
+
+## Stack
+
+- Next.js App Router
+- React 19
+- Tailwind CSS 4
+- Prisma 7
+- Neon/Postgres
+- NextAuth credentials auth
+- Zod validation
 
 ## Setup
 
-1. Copy `.env.example` to `.env` and set `DATABASE_URL` to your Neon connection string.
-2. Set `NEXTAUTH_SECRET` to a strong random value. For NextAuth v4,
-   `NEXTAUTH_URL` should point at your app URL.
-3. Install dependencies with `npm install`.
-4. Generate and migrate the database:
+1. Copy `.env.example` to `.env`.
+2. Set `DATABASE_URL` to your Neon connection string.
+3. Set `NEXTAUTH_SECRET` to a strong random value.
+4. Set `NEXTAUTH_URL` to your local or deployed app URL.
+5. Install dependencies:
 
 ```bash
-npx prisma generate
-npx prisma migrate dev --name init
+npm install
 ```
 
-5. Run the app:
+6. Generate Prisma Client and apply migrations:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+7. Run the app:
 
 ```bash
 npm run dev
 ```
+
+## Frontend Routes
+
+- `/` - Homepage with hero, development areas, featured content, trending posts, newsletter signup, ecosystem CTA, and footer.
+- `/development-areas` - Grid of all development areas.
+- `/development-areas/[slug]` - Development area detail page.
+- `/articles` - Article index placeholder wired for API integration.
+- `/articles/[slug]` - Article detail placeholder.
+- `/about` - Platform overview.
+- `/login` - Credentials login page.
+- `/signup` - Registration page with role selection.
+- `/dashboard` - Editorial dashboard placeholder.
+- `/news`, `/editorials`, `/media` - Content-type entry pages.
+
+## Frontend Sections
+
+- Top navigation: Home, Articles, Development Areas, About, Join Community.
+- Hero: "Grow, Learn, and Build Your Future".
+- Development Areas:
+  - Leadership Development
+  - Professional & Business Development
+  - Technological Development
+  - Financial Development
+  - Educational Development
+  - Environmental Sustainability
+  - Relationship Development
+- Featured Content.
+- Trending Now.
+- Stay Informed email signup.
+- JMO Ecosystem CTA for JMO BIZHUB and JMO Academy.
+- Footer with quick links, ecosystem links, contact details, and social links.
+- Global light/dark screen toggle.
 
 ## API Surface
 
@@ -41,3 +95,35 @@ npm run dev
 - `CONTRIBUTOR`: can create draft or review posts.
 - `EDITOR`: can publish and manage articles/categories.
 - `ADMIN`: full editorial control.
+
+## Database
+
+The Prisma schema includes:
+
+- Auth models: `User`, `Account`, `Session`, `VerificationToken`
+- Content models: `Article`, `Category`, `MediaAsset`, `Comment`
+- Enums: `UserRole`, `ArticleStatus`, `ArticleType`, `MediaType`
+
+Prisma 7 uses `prisma.config.ts` for datasource configuration. The schema is
+configured for Postgres/Neon.
+
+## Useful Commands
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run db:generate
+npm run db:migrate
+npm run db:studio
+```
+
+## Validation
+
+Before handoff, run:
+
+```bash
+npm run lint
+DATABASE_URL="postgresql://user:password@localhost:5432/jmo_media" npx prisma validate
+npm run build
+```
