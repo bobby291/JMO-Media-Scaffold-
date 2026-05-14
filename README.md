@@ -35,6 +35,7 @@ npm install
 ```bash
 npm run db:generate
 npm run db:migrate
+npm run db:seed
 ```
 
 7. Run the app:
@@ -55,6 +56,7 @@ npm run dev
 - `/signup` - Registration page with role selection.
 - `/dashboard` - Editorial dashboard placeholder.
 - `/news`, `/editorials`, `/media` - Content-type entry pages.
+- Newsletter signup posts to `/api/newsletter` and stores email subscriptions in the database.
 
 ## Frontend Sections
 
@@ -88,6 +90,7 @@ npm run dev
 - `POST /api/articles/:slug/comments` adds authenticated comments.
 - `GET /api/categories` lists categories.
 - `POST /api/categories` creates categories for editors and admins.
+- `POST /api/newsletter` stores an email subscription.
 
 ## Roles
 
@@ -101,7 +104,7 @@ npm run dev
 The Prisma schema includes:
 
 - Auth models: `User`, `Account`, `Session`, `VerificationToken`
-- Content models: `Article`, `Category`, `MediaAsset`, `Comment`
+- Content models: `Article`, `Category`, `MediaAsset`, `Comment`, `NewsletterSubscription`
 - Enums: `UserRole`, `ArticleStatus`, `ArticleType`, `MediaType`
 
 Prisma 7 uses `prisma.config.ts` for datasource configuration. The schema is
@@ -115,6 +118,7 @@ npm run build
 npm run lint
 npm run db:generate
 npm run db:migrate
+npm run db:seed
 npm run db:studio
 ```
 

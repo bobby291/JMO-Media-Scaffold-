@@ -1,0 +1,144 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+
+const articleTypes = [
+  { value: "ARTICLE", label: "Article" },
+  { value: "NEWS", label: "News" },
+  { value: "EDITORIAL", label: "Editorial" },
+  { value: "MEDIA", label: "Media" },
+];
+
+export default function CreateArticleForm() {
+  const router = useRouter();
+  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    const form = new FormData(event.currentTarget);
+    const response = await fetch("/api/articles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: form.get("title"),
+        excerpt: form.get("excerpt"),
+        content: form.get("content"),
+        coverImage: form.get("coverImage") || undefined,
+        type: form.get("type"),
+        status: form.get("status"),
+      }),
+    });
+
+    setLoading(false);
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      setError(payload?.error ?? "Unable to create article");
+      return;
+    }
+
+    setSuccess("Article saved successfully.");
+    event.currentTarget.reset();
+    router.refresh();
+  }
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="rounded-2xl border border-[#e4e4e4] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#222]"
+    >
+      <h2 className="text-2xl font-bold">Create content</h2>
+      <p className="mt-2 text-[#707070] dark:text-white/65">
+        This form posts directly to <code>/api/articles</code> and persists the
+        record in Neon through Prisma.
+      </p>
+
+      <div className="mt-6 grid gap-4">
+        <label className="block font-semibold">
+          Title
+          <input
+            name="title"
+            required
+            minLength={4}
+            className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+          />
+        </label>
+
+        <label className="block font-semibold">
+          Excerpt
+          <textarea
+            name="excerpt"
+            className="mt-2 min-h-24 w-full resize-none rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+          />
+        </label>
+
+        <label className="block font-semibold">
+          Content
+          <textarea
+            name="content"
+            required
+            minLength={20}
+            className="mt-2 min-h-48 w-full resize-none rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+          />
+        </label>
+
+        <label className="block font-semibold">
+          Cover image URL
+          <input
+            name="coverImage"
+            type="url"
+            className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+          />
+        </label>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block font-semibold">
+            Type
+            <select
+              name="type"
+              defaultValue="ARTICLE"
+              className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+            >
+              {articleTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block font-semibold">
+            Status
+            <select
+              name="status"
+              defaultValue="DRAFT"
+              className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+            >
+              <option value="DRAFT">Draft</option>
+              <option value="REVIEW">Review</option>
+              <option value="PUBLISHED">Published</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
+      {success ? <p className="mt-4 text-sm text-emerald-600">{success}</p> : null}
+
+      <button
+        disabled={loading}
+        className="mt-6 rounded-xl bg-[#7427b3] px-6 py-3 font-semibold text-white disabled:opacity-60"
+      >
+        {loading ? "Saving..." : "Save article"}
+      </button>
+    </form>
+  );
+}

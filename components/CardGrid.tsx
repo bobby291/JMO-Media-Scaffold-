@@ -1,12 +1,14 @@
 import { ArrowRight, Clock, Mail } from "lucide-react";
 import Link from "next/link";
 
+import NewsletterForm from "@/components/NewsletterForm";
 import {
   developmentAreas,
   ecosystemLinks,
   featuredArticles,
   trendingPosts,
 } from "@/lib/content";
+import type { ArticlePreview } from "@/lib/articles";
 
 const toneClasses = {
   purple: "bg-[#f1e8f8] text-[#7427b3]",
@@ -14,8 +16,6 @@ const toneClasses = {
   green: "bg-emerald-50 text-emerald-700",
   rose: "bg-rose-50 text-rose-600",
 };
-
-type ArticlePreview = (typeof featuredArticles)[number];
 
 function ArticleCard({ article }: { article: ArticlePreview }) {
   return (
@@ -83,7 +83,16 @@ function ArticleSection({
   );
 }
 
-export default function CardGrid() {
+export default function CardGrid({
+  featured = featuredArticles,
+  trending = trendingPosts,
+}: {
+  featured?: ArticlePreview[];
+  trending?: ArticlePreview[];
+}) {
+  const featuredItems = featured.length > 0 ? featured : featuredArticles;
+  const trendingItems = trending.length > 0 ? trending : trendingPosts;
+
   return (
     <>
       <section className="bg-white px-6 py-24 text-[#191919] dark:bg-[#191919] dark:text-white md:px-10">
@@ -131,13 +140,13 @@ export default function CardGrid() {
       <ArticleSection
         title="Featured Content"
         subtitle="Handpicked articles to accelerate your growth"
-        articles={featuredArticles.slice(0, 2)}
+        articles={featuredItems.slice(0, 2)}
       />
 
       <ArticleSection
         title="Trending Now"
         subtitle="Most popular content from our community"
-        articles={trendingPosts}
+        articles={trendingItems.slice(0, 2)}
         className="bg-white dark:bg-[#191919]"
       />
 
@@ -148,16 +157,7 @@ export default function CardGrid() {
           <p className="mt-8 text-3xl leading-snug text-white/95">
             Get the latest articles and insights delivered directly to your inbox
           </p>
-          <form className="mx-auto mt-16 flex max-w-3xl flex-col items-center gap-6 sm:flex-row">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="min-h-20 flex-1 rounded-[18px] bg-white px-8 text-2xl text-[#191919] outline-none placeholder:text-[#5b2d71]"
-            />
-            <button className="min-h-20 rounded-[18px] bg-[#dfbb35] px-14 text-2xl font-bold text-[#191919]">
-              Subscribe
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
       </section>
 
