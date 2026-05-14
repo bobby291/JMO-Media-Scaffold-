@@ -1,6 +1,7 @@
 import { Clock } from "lucide-react";
 import Link from "next/link";
 
+import Navbar from "@/components/Navbar";
 import { featuredArticles } from "@/lib/content";
 import { getPublishedArticles, toArticlePreview } from "@/lib/articles";
 
@@ -8,10 +9,21 @@ export const dynamic = "force-dynamic";
 
 export default async function ArticlesPage() {
   const dbArticles = await getPublishedArticles(50);
-  const articles = dbArticles.length > 0 ? dbArticles.map(toArticlePreview) : featuredArticles;
+  const dbPreviews = dbArticles.map(toArticlePreview);
+  const articles = [
+    ...featuredArticles,
+    ...dbPreviews.filter(
+      (article) =>
+        !featuredArticles.some(
+          (featured) =>
+            featured.slug === article.slug || featured.title === article.title,
+        ),
+    ),
+  ];
 
   return (
     <main className="min-h-screen bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
+      <Navbar showHero={false} />
       <section className="bg-[#7427b3] px-6 py-20 text-center text-white md:px-10">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/75">
           Articles

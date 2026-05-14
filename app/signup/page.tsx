@@ -1,19 +1,33 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { ArrowLeft, BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 const roles = [
-  { value: "READER", label: "Reader" },
-  { value: "CONTRIBUTOR", label: "Contributor" },
-  { value: "EDITOR", label: "Editor" },
-  { value: "ADMIN", label: "Admin" },
+  {
+    value: "CONTRIBUTOR",
+    label: "Contributor",
+    description: "Draft articles, media updates, and editorial submissions.",
+  },
+  {
+    value: "EDITOR",
+    label: "Editor",
+    description: "Review, publish, and moderate platform content.",
+  },
+  {
+    value: "ADMIN",
+    label: "Admin",
+    description: "Manage platform operations, roles, and editorial access.",
+  },
 ];
 
 export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("CONTRIBUTOR");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,7 +45,7 @@ export default function SignupPage() {
         name: form.get("name"),
         email,
         password,
-        role: form.get("role"),
+        role: selectedRole,
       }),
     });
 
@@ -54,89 +68,172 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="grid min-h-screen bg-[#fbf9ff] text-slate-950 lg:grid-cols-[0.85fr_1fr]">
-      <section className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white/80 p-8 shadow-xl shadow-indigo-900/5 backdrop-blur">
-          <Link href="/" className="mb-8 inline-flex text-sm font-semibold text-slate-600">
+    <main className="grid min-h-screen overflow-hidden bg-[#fbf9ff] text-[#080b19] dark:bg-[#0d0d12] dark:text-white lg:grid-cols-[0.98fr_1.02fr]">
+      <section className="relative flex items-center justify-center px-6 py-12 md:px-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(116,39,179,0.14),transparent_32%),radial-gradient(circle_at_86%_80%,rgba(223,187,53,0.16),transparent_30%)]" />
+
+        <div className="relative w-full max-w-[620px] animate-jmo-fade-up rounded-[28px] border border-[#ded7ea] bg-white p-8 shadow-[0_24px_80px_rgba(63,31,96,0.14)] dark:border-white/10 dark:bg-[#191919] md:p-12">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-base font-bold text-[#4f5d75] transition hover:text-[#7427b3] dark:text-white/70"
+          >
+            <ArrowLeft size={19} />
             Back to home
           </Link>
-          <h1 className="text-3xl font-semibold">Create account</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Choose a role and join the publishing workflow.
-          </p>
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
-            <label className="block text-sm font-medium">
-              Name
-              <input
-                name="name"
-                required
-                minLength={2}
-                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              />
+
+          <div className="mt-10 flex items-start gap-4">
+            <span className="grid size-14 place-items-center rounded-2xl bg-[#f1e8f8] text-[#7427b3]">
+              <Shield size={29} />
+            </span>
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.22em] text-[#7427b3]">
+                Platform access
+              </p>
+              <h1 className="mt-2 text-5xl font-black tracking-tight">
+                Create staff account
+              </h1>
+              <p className="mt-3 text-lg leading-8 text-[#4f5d75] dark:text-white/65">
+                For contributors, editors, and admins who manage content in the dashboard.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={onSubmit} className="mt-10 space-y-6">
+            <label className="block text-base font-bold text-[#111827] dark:text-white">
+              Full name
+              <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
+                <User size={22} className="text-[#7427b3]" />
+                <input
+                  name="name"
+                  required
+                  minLength={2}
+                  autoComplete="name"
+                  placeholder="John Doe"
+                  className="w-full bg-transparent py-4 text-lg text-[#080b19] outline-none placeholder:text-[#68758a] dark:text-white"
+                />
+              </span>
             </label>
-            <label className="block text-sm font-medium">
-              Email
-              <input
-                name="email"
-                type="email"
-                required
-                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              />
+
+            <label className="block text-base font-bold text-[#111827] dark:text-white">
+              Email address
+              <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
+                <Mail size={22} className="text-[#7427b3]" />
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="editor@jmomedia.com"
+                  className="w-full bg-transparent py-4 text-lg text-[#080b19] outline-none placeholder:text-[#68758a] dark:text-white"
+                />
+              </span>
             </label>
-            <label className="block text-sm font-medium">
+
+            <label className="block text-base font-bold text-[#111827] dark:text-white">
               Password
-              <input
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              />
+              <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
+                <Lock size={22} className="text-[#7427b3]" />
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  placeholder="Minimum 8 characters"
+                  className="w-full bg-transparent py-4 text-lg text-[#080b19] outline-none placeholder:text-[#68758a] dark:text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="grid size-10 place-items-center rounded-xl text-[#4f5d75] transition hover:bg-[#f1e8f8] hover:text-[#7427b3] dark:text-white/70"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={21} /> : <Eye size={21} />}
+                </button>
+              </span>
             </label>
-            <label className="block text-sm font-medium">
-              Role
-              <select
-                name="role"
-                defaultValue="READER"
-                className="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              >
+
+            <fieldset>
+              <legend className="text-base font-bold text-[#111827] dark:text-white">
+                Dashboard role
+              </legend>
+              <div className="mt-3 grid gap-3">
                 {roles.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
+                  <label
+                    key={role.value}
+                    className={`cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
+                      selectedRole === role.value
+                        ? "border-[#7427b3] bg-[#f6effb] shadow-[0_10px_24px_rgba(116,39,179,0.12)] dark:bg-[#7427b3]/20"
+                        : "border-[#d8deea] bg-white dark:border-white/15 dark:bg-[#111]"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="role"
+                      value={role.value}
+                      checked={selectedRole === role.value}
+                      onChange={() => setSelectedRole(role.value)}
+                      className="sr-only"
+                    />
+                    <span className="flex items-start gap-3">
+                      <span className="mt-1 grid size-6 place-items-center rounded-full border-2 border-[#7427b3]">
+                        {selectedRole === role.value ? (
+                          <span className="size-3 rounded-full bg-[#7427b3]" />
+                        ) : null}
+                      </span>
+                      <span>
+                        <span className="block text-lg font-black">{role.label}</span>
+                        <span className="mt-1 block text-base leading-7 text-[#4f5d75] dark:text-white/65">
+                          {role.description}
+                        </span>
+                      </span>
+                    </span>
+                  </label>
                 ))}
-              </select>
-            </label>
-            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              </div>
+            </fieldset>
+
+            {error ? (
+              <p className="rounded-2xl bg-red-50 px-4 py-3 text-base font-semibold text-red-700">
+                {error}
+              </p>
+            ) : null}
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-indigo-600 px-4 py-3 font-semibold text-white shadow-lg shadow-indigo-600/20 disabled:opacity-60"
+              className="min-h-16 w-full rounded-2xl bg-[#7427b3] px-5 text-xl font-black text-white shadow-[0_16px_34px_rgba(116,39,179,0.32)] transition hover:-translate-y-0.5 hover:bg-[#5d1f92] disabled:translate-y-0 disabled:opacity-60"
             >
-              {loading ? "Creating..." : "Create account"}
+              {loading ? "Creating account..." : "Create dashboard account"}
             </button>
           </form>
-          <p className="mt-6 text-sm text-slate-600">
+
+          <p className="mt-8 text-lg text-[#4f5d75] dark:text-white/65">
             Already registered?{" "}
-            <Link href="/login" className="font-semibold text-slate-950">
+            <Link href="/login" className="font-black text-[#080b19] hover:text-[#7427b3] dark:text-white">
               Login
             </Link>
           </p>
         </div>
       </section>
 
-      <section className="relative hidden overflow-hidden px-12 py-10 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_35%,rgba(99,75,255,0.50),rgba(219,126,214,0.28)_30%,rgba(255,255,255,0)_62%)]" />
-        <div className="relative z-10 ml-auto max-w-xl pt-28">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-rose-500">
-            Join JMO Media
+      <section className="relative hidden overflow-hidden px-12 py-12 lg:block">
+        <div className="absolute inset-0 bg-[#7427b3]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_28%,rgba(223,187,53,0.32),transparent_30%),radial-gradient(circle_at_68%_62%,rgba(255,255,255,0.28),transparent_36%)] animate-jmo-soft-pulse" />
+        <div className="absolute bottom-20 right-16 grid size-24 place-items-center rounded-[28px] border border-white/20 bg-white/10 text-white backdrop-blur animate-jmo-float">
+          <BriefcaseBusiness size={42} />
+        </div>
+
+        <div className="relative z-10 ml-auto max-w-2xl pt-32 animate-jmo-fade-up">
+          <p className="text-sm font-black uppercase tracking-[0.32em] text-[#dfbb35]">
+            Admin and editorial workflow
           </p>
-          <h2 className="mt-5 text-6xl font-semibold leading-tight text-white">
+          <h2 className="mt-7 text-6xl font-black leading-[1.05] text-white xl:text-7xl">
             Build stories with clear publishing roles.
           </h2>
-          <p className="mt-6 text-lg leading-8 text-white/90">
-            Readers comment, contributors draft, editors publish, and admins
-            manage the platform.
+          <p className="mt-8 text-2xl leading-10 text-white/90">
+            Contributors draft, editors publish, and admins manage the platform.
+            Community members now join from a separate public page.
           </p>
         </div>
       </section>

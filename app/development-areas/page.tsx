@@ -22,7 +22,7 @@ export default function DevelopmentAreasPage() {
           </span>
         </Link>
         <Link
-          href="/signup"
+          href="/join"
           className="rounded-[14px] bg-[#7427b3] px-6 py-3 font-medium text-white"
         >
           Join Community

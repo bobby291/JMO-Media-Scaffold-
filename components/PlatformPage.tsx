@@ -32,7 +32,7 @@ export default function PlatformPage({
             <Link href="/login" className="text-slate-600 hover:text-slate-950">
               Sign in
             </Link>
-            <Link href="/signup" className="rounded-md bg-indigo-600 px-4 py-2 text-white">
+            <Link href="/join" className="rounded-md bg-indigo-600 px-4 py-2 text-white">
               Join
             </Link>
           </div>

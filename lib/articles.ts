@@ -24,6 +24,8 @@ export type DbArticle = Prisma.ArticleGetPayload<{
 export type ArticlePreview = {
   slug: string;
   category: string;
+  area?: string;
+  level?: string;
   title: string;
   excerpt: string;
   readTime: string;

@@ -53,10 +53,11 @@ npm run dev
 - `/articles/[slug]` - Article detail placeholder.
 - `/about` - Platform overview.
 - `/login` - Credentials login page.
-- `/signup` - Registration page with role selection.
+- `/join` - Public JMO Community signup with benefits and interest selection.
+- `/signup` - Staff/dashboard registration page with contributor, editor, and admin role selection.
 - `/dashboard` - Editorial dashboard placeholder.
 - `/news`, `/editorials`, `/media` - Content-type entry pages.
-- Newsletter signup posts to `/api/newsletter` and stores email subscriptions in the database.
+- Community and newsletter signup posts to `/api/newsletter` and stores email, name, and selected interests in the database.
 
 ## Frontend Sections
 
@@ -90,7 +91,7 @@ npm run dev
 - `POST /api/articles/:slug/comments` adds authenticated comments.
 - `GET /api/categories` lists categories.
 - `POST /api/categories` creates categories for editors and admins.
-- `POST /api/newsletter` stores an email subscription.
+- `POST /api/newsletter` stores or updates a community/newsletter subscription with optional name and interests.
 
 ## Roles
 

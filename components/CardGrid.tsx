@@ -55,11 +55,13 @@ function ArticleSection({
   title,
   subtitle,
   articles,
+  columns = "xl:grid-cols-3",
   className = "bg-[#f7f7f7] dark:bg-[#222]",
 }: {
   title: string;
   subtitle: string;
   articles: ArticlePreview[];
+  columns?: string;
   className?: string;
 }) {
   return (
@@ -73,7 +75,7 @@ function ArticleSection({
             {subtitle}
           </p>
         </div>
-        <div className="mt-20 grid gap-10 lg:grid-cols-2">
+        <div className={`mt-20 grid gap-10 lg:grid-cols-2 ${columns}`}>
           {articles.map((article) => (
             <ArticleCard key={`${title}-${article.slug}`} article={article} />
           ))}
@@ -140,13 +142,14 @@ export default function CardGrid({
       <ArticleSection
         title="Featured Content"
         subtitle="Handpicked articles to accelerate your growth"
-        articles={featuredItems.slice(0, 2)}
+        articles={featuredItems.slice(0, 3)}
       />
 
       <ArticleSection
         title="Trending Now"
         subtitle="Most popular content from our community"
         articles={trendingItems.slice(0, 2)}
+        columns="xl:grid-cols-2"
         className="bg-white dark:bg-[#191919]"
       />
 

@@ -10,7 +10,7 @@ const quickLinks = [
 const ecosystemLinks = [
   { href: "/development-areas/professional-business-development", label: "JMO BIZHUB" },
   { href: "/development-areas/educational-development", label: "JMO Academy" },
-  { href: "/signup", label: "Join Community" },
+  { href: "/join", label: "Join Community" },
 ];
 
 const socials = [

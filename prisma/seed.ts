@@ -1,56 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
+import { developmentAreas, featuredArticles } from "../lib/content";
+
 const connectionString =
   process.env.DATABASE_URL ?? "postgresql://user:password@localhost:5432/jmo_media";
 
 const adapter = new PrismaNeon({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-const categories = [
-  {
-    name: "Leadership Development",
-    slug: "leadership-development",
-    description: "Build essential leadership skills to inspire and guide teams effectively.",
-  },
-  {
-    name: "Professional & Business Development",
-    slug: "professional-business-development",
-    description: "Advance your career and business acumen with proven strategies.",
-  },
-  {
-    name: "Technological Development",
-    slug: "technological-development",
-    description: "Stay ahead with cutting-edge tech skills and digital innovation.",
-  },
-];
+const areaSlugByName = new Map(
+  developmentAreas.map((area) => [area.title, area.slug]),
+);
 
-const articles = [
-  {
-    title: "The Art of Transformational Leadership in Modern Organizations",
-    slug: "future-ready-leadership",
-    excerpt:
-      "Discover how to inspire and empower your team through authentic leadership practices that drive real change.",
-    content:
-      "Transformational leadership begins with clarity, trust, and consistent communication.\n\nModern organizations need leaders who can connect purpose to execution, invite feedback, and create environments where people can do meaningful work.\n\nStart by defining the mission, listening deeply, and turning values into repeatable team habits.",
-    type: "ARTICLE" as const,
-    coverImage:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1800&auto=format&fit=crop",
-    categorySlug: "leadership-development",
-  },
-  {
-    title: "Building a Personal Brand That Opens Doors",
-    slug: "digital-skills-career-growth",
-    excerpt:
-      "Your personal brand is your professional superpower. Learn how to craft and communicate yours effectively.",
-    content:
-      "A strong personal brand is built through clarity, consistency, and credibility.\n\nDefine the problems you solve, share useful ideas, and make your work easy to understand. Your reputation compounds when your message and actions stay aligned.\n\nUse your channels to teach, document progress, and connect with communities that value your expertise.",
-    type: "EDITORIAL" as const,
-    coverImage:
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1800&auto=format&fit=crop",
-    categorySlug: "professional-business-development",
-  },
-];
+function buildArticleBody(article: (typeof featuredArticles)[number]) {
+  const sectionText = article.sections
+    .map((section) => {
+      const bullets = section.bullets?.length
+        ? `\n${section.bullets.map((bullet) => `- ${bullet}`).join("\n")}`
+        : "";
+
+      return `${section.heading}\n${section.body}${bullets}`;
+    })
+    .join("\n\n");
+
+  return [
+    article.intro,
+    sectionText,
+    article.quote ? `"${article.quote}"` : "",
+    `About ${article.author}\n${article.authorBio}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
 
 async function main() {
   const author = await prisma.user.upsert({
@@ -63,40 +45,49 @@ async function main() {
     },
   });
 
-  for (const category of categories) {
+  for (const category of developmentAreas) {
     await prisma.category.upsert({
       where: { slug: category.slug },
-      update: category,
-      create: category,
+      update: {
+        name: category.title,
+        description: category.description,
+      },
+      create: {
+        name: category.title,
+        slug: category.slug,
+        description: category.description,
+      },
     });
   }
 
-  for (const article of articles) {
+  for (const article of featuredArticles) {
     const category = await prisma.category.findUnique({
-      where: { slug: article.categorySlug },
+      where: { slug: areaSlugByName.get(article.area) ?? "leadership-development" },
     });
+    const content = buildArticleBody(article);
+    const publishedAt = new Date(`${article.date} 09:00:00 UTC`);
 
     await prisma.article.upsert({
       where: { slug: article.slug },
       update: {
         title: article.title,
         excerpt: article.excerpt,
-        content: article.content,
-        type: article.type,
-        coverImage: article.coverImage,
+        content,
+        type: article.category === "technology" ? "NEWS" : "ARTICLE",
+        coverImage: article.image,
         status: "PUBLISHED",
-        publishedAt: new Date("2026-04-15T09:00:00.000Z"),
+        publishedAt,
         categoryId: category?.id,
       },
       create: {
         title: article.title,
         slug: article.slug,
         excerpt: article.excerpt,
-        content: article.content,
-        type: article.type,
-        coverImage: article.coverImage,
+        content,
+        type: article.category === "technology" ? "NEWS" : "ARTICLE",
+        coverImage: article.image,
         status: "PUBLISHED",
-        publishedAt: new Date("2026-04-15T09:00:00.000Z"),
+        publishedAt,
         categoryId: category?.id,
         authorId: author.id,
       },

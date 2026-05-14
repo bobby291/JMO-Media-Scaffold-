@@ -11,7 +11,7 @@ const navLinks = [
   { href: "/about", label: "About" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ showHero = true }: { showHero?: boolean }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
@@ -39,7 +39,7 @@ export default function Navbar() {
         </div>
 
         <Link
-          href="/signup"
+          href="/join"
           className="hidden rounded-[14px] bg-[#7427b3] px-8 py-4 text-lg font-medium text-white shadow-sm transition hover:bg-[#5d1f92] lg:inline-flex"
         >
           Join Community
@@ -62,7 +62,7 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="/signup"
+            href="/join"
             onClick={() => setMenuOpen(false)}
             className="rounded-xl bg-[#7427b3] px-6 py-3 text-white"
           >
@@ -78,6 +78,7 @@ export default function Navbar() {
         </div>
       )}
 
+      {showHero ? (
       <section className="bg-[#7427b3] px-6 py-24 text-center text-white md:px-10 md:py-32 lg:py-40">
         <div className="mx-auto max-w-[1180px]">
           <Link
@@ -105,7 +106,7 @@ export default function Navbar() {
               <ArrowRight size={24} />
             </Link>
             <Link
-              href="/signup"
+              href="/join"
               className="inline-flex items-center justify-center rounded-[14px] bg-[#dfbb35] px-9 py-5 text-lg font-semibold text-[#161616] transition hover:bg-[#cfa820]"
             >
               Join Community
@@ -113,6 +114,7 @@ export default function Navbar() {
           </div>
         </div>
       </section>
+      ) : null}
     </header>
   );
 }
