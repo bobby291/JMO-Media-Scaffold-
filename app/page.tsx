@@ -1,4 +1,5 @@
 import CardGrid from "@/components/CardGrid";
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 
 export default function Home() {
@@ -6,6 +7,7 @@ export default function Home() {
     <main>
       <Navbar />
       <CardGrid />
+      <Footer />
     </main>
   );
 }
