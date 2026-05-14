@@ -64,35 +64,45 @@ export const developmentAreas = [
 export const featuredArticles = [
   {
     slug: "future-ready-leadership",
-    category: "Leadership",
-    title: "Future-ready leadership habits for fast-changing teams",
+    category: "leadership",
+    title: "The Art of Transformational Leadership in Modern Organizations",
     excerpt:
-      "A practical guide to clarity, communication, and decision-making for emerging leaders.",
-    readTime: "7 min read",
+      "Discover how to inspire and empower your team through authentic leadership practices that drive real...",
+    readTime: "8 min read",
+    author: "James Morrison",
+    date: "Apr 15, 2026",
+    image:
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1800&auto=format&fit=crop",
   },
   {
     slug: "digital-skills-career-growth",
-    category: "Technology",
-    title: "Digital skills every professional should build this year",
+    category: "professional-business",
+    title: "Building a Personal Brand That Opens Doors",
     excerpt:
-      "Explore the tools and habits that help professionals stay relevant in a digital economy.",
+      "Your personal brand is your professional superpower. Learn how to craft and communicate yours effectively.",
     readTime: "6 min read",
+    author: "Sarah Chen",
+    date: "Apr 12, 2026",
+    image:
+      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1800&auto=format&fit=crop",
   },
   {
     slug: "financial-discipline-for-builders",
-    category: "Finance",
+    category: "financial",
     title: "Financial discipline for builders, creators, and founders",
     excerpt:
       "Simple structures for managing resources while pursuing ambitious personal goals.",
     readTime: "5 min read",
+    author: "Nora Williams",
+    date: "Apr 09, 2026",
+    image:
+      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1800&auto=format&fit=crop",
   },
 ];
 
 export const trendingPosts = [
-  "How to build a resilient mindset",
-  "Business lessons from community-led brands",
-  "Practical sustainability for everyday life",
-  "Relationship habits that protect your focus",
+  featuredArticles[0],
+  featuredArticles[1],
 ];
 
 export const ecosystemLinks = [

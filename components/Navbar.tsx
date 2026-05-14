@@ -15,7 +15,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
-    <header className="bg-white text-[#191919]">
+    <header className="bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
       <nav className="mx-auto flex h-24 max-w-[1408px] items-center justify-between px-6 md:px-9 lg:px-12">
         <Link href="/" className="flex items-center gap-4" aria-label="JMO Media home">
           <span className="grid size-14 place-items-center rounded-[14px] bg-[#7427b3] text-xl font-bold text-white shadow-sm">
@@ -31,7 +31,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-[#222] transition hover:text-[#7427b3]"
+            className="text-[#222] transition hover:text-[#7427b3] dark:text-white/75 dark:hover:text-white"
             >
               {link.label}
             </Link>
@@ -46,7 +46,7 @@ export default function Navbar() {
         </Link>
 
         <button
-          className="grid size-11 place-items-center rounded-lg border border-slate-200 lg:hidden"
+          className="grid size-11 place-items-center rounded-lg border border-slate-200 lg:hidden dark:border-white/15"
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
         >

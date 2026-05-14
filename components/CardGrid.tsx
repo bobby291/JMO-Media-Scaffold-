@@ -1,4 +1,4 @@
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Clock, Mail } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -15,20 +15,88 @@ const toneClasses = {
   rose: "bg-rose-50 text-rose-600",
 };
 
+type ArticlePreview = (typeof featuredArticles)[number];
+
+function ArticleCard({ article }: { article: ArticlePreview }) {
+  return (
+    <Link
+      href={`/articles/${article.slug}`}
+      className="overflow-hidden rounded-[22px] border border-[#e1e1e1] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.14)] transition hover:-translate-y-1 hover:shadow-[0_8px_28px_rgba(0,0,0,0.18)] dark:border-white/10 dark:bg-[#222]"
+    >
+      <div
+        className="h-[370px] bg-cover bg-center"
+        style={{ backgroundImage: `url(${article.image})` }}
+      />
+      <div className="p-10">
+        <div className="flex flex-wrap items-center gap-4 text-xl">
+          <span className="font-semibold text-[#7427b3]">{article.category}</span>
+          <span className="text-[#707070]">•</span>
+          <span className="inline-flex items-center gap-2 text-[#707070] dark:text-white/60">
+            <Clock size={22} />
+            {article.readTime}
+          </span>
+        </div>
+        <h3 className="mt-7 text-3xl font-bold leading-tight text-[#191919] dark:text-white">
+          {article.title}
+        </h3>
+        <p className="mt-6 text-2xl leading-9 text-[#707070] dark:text-white/65">
+          {article.excerpt}
+        </p>
+        <div className="mt-9 flex items-center justify-between gap-4 text-xl">
+          <span className="font-bold text-[#191919] dark:text-white">{article.author}</span>
+          <span className="text-[#707070] dark:text-white/60">{article.date}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ArticleSection({
+  title,
+  subtitle,
+  articles,
+  className = "bg-[#f7f7f7] dark:bg-[#222]",
+}: {
+  title: string;
+  subtitle: string;
+  articles: ArticlePreview[];
+  className?: string;
+}) {
+  return (
+    <section className={`${className} px-6 py-24 md:px-10`}>
+      <div className="mx-auto max-w-[1408px]">
+        <div className="text-center">
+          <h2 className="text-5xl font-bold leading-tight text-[#191919] dark:text-white md:text-6xl">
+            {title}
+          </h2>
+          <p className="mx-auto mt-7 max-w-4xl text-3xl leading-snug text-[#707070] dark:text-white/65">
+            {subtitle}
+          </p>
+        </div>
+        <div className="mt-20 grid gap-10 lg:grid-cols-2">
+          {articles.map((article) => (
+            <ArticleCard key={`${title}-${article.slug}`} article={article} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function CardGrid() {
   return (
     <>
-      <section className="bg-white px-6 py-24 text-[#191919] md:px-10">
+      <section className="bg-white px-6 py-24 text-[#191919] dark:bg-[#191919] dark:text-white md:px-10">
         <div className="mx-auto max-w-[1408px]">
           <div className="text-center">
-            <h2 className="text-4xl font-bold md:text-5xl">Development Areas</h2>
-            <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#707070]">
+            <h2 className="text-5xl font-bold md:text-6xl">Development Areas</h2>
+            <p className="mx-auto mt-7 max-w-4xl text-3xl leading-snug text-[#707070] dark:text-white/65">
               Choose your path to growth and explore content tailored to your
               development goals
             </p>
           </div>
 
-          <div className="mt-16 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-20 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
             {developmentAreas.map((area) => {
               const Icon = area.icon;
 
@@ -36,7 +104,7 @@ export default function CardGrid() {
                 <Link
                   key={area.slug}
                   href={`/development-areas/${area.slug}`}
-                  className="group rounded-2xl border border-[#e4e4e4] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-[#7427b3]/30 hover:shadow-xl"
+                  className="group rounded-2xl border border-[#e4e4e4] bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-[#7427b3]/30 hover:shadow-xl dark:border-white/10 dark:bg-[#222]"
                 >
                   <span
                     className={`grid size-20 place-items-center rounded-2xl ${
@@ -46,7 +114,7 @@ export default function CardGrid() {
                     <Icon size={34} />
                   </span>
                   <h3 className="mt-8 text-2xl font-bold leading-tight">{area.title}</h3>
-                  <p className="mt-5 text-lg leading-8 text-[#707070]">
+                  <p className="mt-5 text-lg leading-8 text-[#707070] dark:text-white/65">
                     {area.description}
                   </p>
                   <span className="mt-7 inline-flex items-center gap-2 text-base font-semibold text-[#7427b3] opacity-0 transition group-hover:opacity-100">
@@ -60,102 +128,40 @@ export default function CardGrid() {
         </div>
       </section>
 
-      <section className="bg-[#f7f7f7] px-6 py-24 md:px-10">
-        <div className="mx-auto max-w-[1408px]">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#7427b3]">
-                Featured Content
-              </p>
-              <h2 className="mt-4 text-4xl font-bold md:text-5xl">
-                Top articles for your next step
-              </h2>
-            </div>
-            <Link
-              href="/articles"
-              className="inline-flex items-center gap-2 text-lg font-semibold text-[#7427b3]"
-            >
-              View all articles
-              <ArrowRight size={22} />
-            </Link>
-          </div>
+      <ArticleSection
+        title="Featured Content"
+        subtitle="Handpicked articles to accelerate your growth"
+        articles={featuredArticles.slice(0, 2)}
+      />
 
-          <div className="mt-12 grid gap-7 lg:grid-cols-3">
-            {featuredArticles.map((article) => (
-              <Link
-                href={`/articles/${article.slug}`}
-                key={article.slug}
-                className="rounded-2xl border border-[#e4e4e4] bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-[#f1e8f8] px-4 py-2 text-sm font-semibold text-[#7427b3]">
-                    {article.category}
-                  </span>
-                  <span className="text-sm text-[#707070]">{article.readTime}</span>
-                </div>
-                <h3 className="mt-8 text-2xl font-bold leading-tight">
-                  {article.title}
-                </h3>
-                <p className="mt-5 text-lg leading-8 text-[#707070]">
-                  {article.excerpt}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <ArticleSection
+        title="Trending Now"
+        subtitle="Most popular content from our community"
+        articles={trendingPosts}
+        className="bg-white dark:bg-[#191919]"
+      />
+
+      <section className="bg-[#7427b3] px-6 py-28 text-center text-white md:px-10">
+        <div className="mx-auto max-w-5xl">
+          <Mail className="mx-auto" size={72} strokeWidth={2.4} />
+          <h2 className="mt-12 text-5xl font-bold md:text-6xl">Stay Informed</h2>
+          <p className="mt-8 text-3xl leading-snug text-white/95">
+            Get the latest articles and insights delivered directly to your inbox
+          </p>
+          <form className="mx-auto mt-16 flex max-w-3xl flex-col items-center gap-6 sm:flex-row">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="min-h-20 flex-1 rounded-[18px] bg-white px-8 text-2xl text-[#191919] outline-none placeholder:text-[#5b2d71]"
+            />
+            <button className="min-h-20 rounded-[18px] bg-[#dfbb35] px-14 text-2xl font-bold text-[#191919]">
+              Subscribe
+            </button>
+          </form>
         </div>
       </section>
 
-      <section className="bg-white px-6 py-24 md:px-10">
-        <div className="mx-auto grid max-w-[1408px] gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-2xl bg-[#7427b3] p-10 text-white">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/70">
-              Trending Posts
-            </p>
-            <h2 className="mt-4 text-4xl font-bold leading-tight">
-              Popular content readers are exploring now.
-            </h2>
-            <div className="mt-8 space-y-4">
-              {trendingPosts.map((post, index) => (
-                <Link
-                  key={post}
-                  href="/articles"
-                  className="flex items-center gap-4 rounded-xl bg-white/10 p-4 transition hover:bg-white/15"
-                >
-                  <span className="text-xl font-bold text-[#dfbb35]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-lg">{post}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-[#e4e4e4] p-10">
-            <div className="grid size-16 place-items-center rounded-2xl bg-[#fbf6e7] text-[#caa225]">
-              <Mail size={30} />
-            </div>
-            <h2 className="mt-8 text-4xl font-bold leading-tight">
-              Get weekly development insights.
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-[#707070]">
-              Subscribe for thoughtful articles across leadership, business,
-              technology, finance, education, sustainability, and relationships.
-            </p>
-            <form className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="min-h-14 flex-1 rounded-xl border border-[#d7d7d7] px-5 outline-none focus:border-[#7427b3]"
-              />
-              <button className="rounded-xl bg-[#dfbb35] px-7 py-4 font-semibold text-[#161616]">
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#f7f7f7] px-6 py-24 md:px-10">
+      <section className="bg-[#f7f7f7] px-6 py-24 dark:bg-[#222] md:px-10">
         <div className="mx-auto max-w-[1408px] rounded-3xl bg-[#191919] p-10 text-white md:p-14">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
