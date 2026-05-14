@@ -1,11 +1,17 @@
+import PlatformPage from "@/components/PlatformPage";
+
 export default function NewsPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-16">
-      <h1 className="text-3xl font-semibold">News</h1>
-      <p className="mt-4 text-neutral-600">
-        Placeholder route. Fetch published news from
-        <code className="mx-1 rounded bg-neutral-100 px-1">/api/articles?type=NEWS</code>.
-      </p>
-    </main>
+    <PlatformPage
+      eyebrow="News"
+      title="Fast updates for current stories and newsroom coverage."
+      description="The news section is wired to published article records with type filtering, author data, categories, media assets, and comment counts."
+      apiLabel="GET /api/articles?type=NEWS"
+      highlights={[
+        "Published news is filtered through the article API.",
+        "Drafts remain hidden unless the user owns or manages the article.",
+        "Each story supports cover media, category metadata, and comments.",
+      ]}
+    />
   );
 }

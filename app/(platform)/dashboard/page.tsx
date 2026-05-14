@@ -1,11 +1,17 @@
+import PlatformPage from "@/components/PlatformPage";
+
 export default function DashboardPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-16">
-      <h1 className="text-3xl font-semibold">Editorial Dashboard</h1>
-      <p className="mt-4 text-neutral-600">
-        Placeholder dashboard for contributors, editors, and admins. Create
-        content with <code className="rounded bg-neutral-100 px-1">POST /api/articles</code>.
-      </p>
-    </main>
+    <PlatformPage
+      eyebrow="Editorial dashboard"
+      title="Create, review, and publish content with clear role rules."
+      description="The dashboard route gives frontend developers a destination for contributor, editor, and admin workflows while the backend enforces access control."
+      apiLabel="POST /api/articles"
+      highlights={[
+        "Contributors can create drafts and review submissions.",
+        "Editors and admins can publish stories.",
+        "Owners, editors, and admins can update or delete article records.",
+      ]}
+    />
   );
 }

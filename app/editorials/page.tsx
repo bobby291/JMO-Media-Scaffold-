@@ -1,14 +1,17 @@
+import PlatformPage from "@/components/PlatformPage";
+
 export default function EditorialsPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-16">
-      <h1 className="text-3xl font-semibold">Editorials</h1>
-      <p className="mt-4 text-neutral-600">
-        Placeholder route. Fetch published editorials from
-        <code className="mx-1 rounded bg-neutral-100 px-1">
-          /api/articles?type=EDITORIAL
-        </code>
-        .
-      </p>
-    </main>
+    <PlatformPage
+      eyebrow="Editorials"
+      title="Opinion, analysis, and reviewed publishing in one workflow."
+      description="Editorial content uses the same publishing engine as articles while preserving its own content type for frontend filtering and presentation."
+      apiLabel="GET /api/articles?type=EDITORIAL"
+      highlights={[
+        "Contributors can submit drafts or review-ready pieces.",
+        "Editors and admins can publish approved stories.",
+        "The frontend can render editorial pages from the shared article model.",
+      ]}
+    />
   );
 }

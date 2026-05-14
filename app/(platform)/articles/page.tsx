@@ -1,12 +1,17 @@
+import PlatformPage from "@/components/PlatformPage";
+
 export default function ArticlesPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-16">
-      <h1 className="text-3xl font-semibold">Articles</h1>
-      <p className="mt-4 text-neutral-600">
-        Placeholder article index for frontend integration. Use
-        <code className="mx-1 rounded bg-neutral-100 px-1">GET /api/articles</code>
-        for published content.
-      </p>
-    </main>
+    <PlatformPage
+      eyebrow="Articles"
+      title="Browse published stories from the JMO Media platform."
+      description="The article index is ready for frontend integration with the published-content API and can be filtered by status, author, or content type."
+      apiLabel="GET /api/articles"
+      highlights={[
+        "Returns published content by default.",
+        "Supports query filters for status, type, and author.",
+        "Includes author, category, media, and comment count data.",
+      ]}
+    />
   );
 }

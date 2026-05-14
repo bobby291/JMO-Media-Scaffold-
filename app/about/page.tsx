@@ -1,12 +1,17 @@
+import PlatformPage from "@/components/PlatformPage";
+
 export default function AboutPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-16">
-      <h1 className="text-3xl font-semibold">About JMO Media</h1>
-      <p className="mt-4 text-neutral-600">
-        Placeholder page for the frontend team. The backend now supports users,
-        roles, articles, media entries, editorial posts, news, categories, and
-        comments.
-      </p>
-    </main>
+    <PlatformPage
+      eyebrow="About the platform"
+      title="A focused media system for contributors, editors, and readers."
+      description="JMO Media is shaped around a practical publishing workflow: users choose roles, contributors create content, editors publish, and readers engage through comments."
+      apiLabel="GET /api/me"
+      highlights={[
+        "Role-aware accounts for readers, contributors, editors, and admins.",
+        "Structured content models for articles, news, editorials, and media.",
+        "Frontend routes are ready for the Figma visual layer and backend APIs.",
+      ]}
+    />
   );
 }

@@ -29,10 +29,13 @@ const Card = () => {
         transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
       }}
     >
-      <img
-        src="https://images.unsplash.com/photo-1747134392471-831ea9a48e1e?q=80&w=2000&auto=format&fit=crop"
-        alt="City skyline"
-        className="w-full h-52 object-cover"
+      <div
+        className="h-52 w-full bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url(https://images.unsplash.com/photo-1747134392471-831ea9a48e1e?q=80&w=2000&auto=format&fit=crop)",
+        }}
+        aria-label="City skyline"
       />
 
       <h3 className="mt-3 px-4 pt-3 mb-1 text-lg font-semibold text-gray-800">
