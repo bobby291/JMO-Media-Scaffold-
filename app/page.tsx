@@ -21,7 +21,7 @@ export default async function Home() {
   ];
 
   return (
-    <main>
+    <main id="top">
       <Navbar />
       <CardGrid
         featured={mergedArticles.slice(0, 3)}

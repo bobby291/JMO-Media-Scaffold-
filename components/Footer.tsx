@@ -65,7 +65,7 @@ function SocialIcon({ name }: { name: string }) {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#191919] px-6 py-20 text-white md:px-10">
+    <footer id="footer" className="scroll-mt-32 bg-[#191919] px-6 py-20 text-white md:px-10">
       <div className="mx-auto max-w-[1408px]">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
           <div>

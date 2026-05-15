@@ -55,17 +55,19 @@ function ArticleSection({
   title,
   subtitle,
   articles,
+  id,
   columns = "xl:grid-cols-3",
   className = "bg-[#f7f7f7] dark:bg-[#222]",
 }: {
   title: string;
   subtitle: string;
   articles: ArticlePreview[];
+  id?: string;
   columns?: string;
   className?: string;
 }) {
   return (
-    <section className={`${className} px-6 py-24 md:px-10`}>
+    <section id={id} className={`${className} scroll-mt-32 px-6 py-24 md:px-10`}>
       <div className="mx-auto max-w-[1408px]">
         <div className="text-center">
           <h2 className="text-5xl font-bold leading-tight text-[#191919] dark:text-white md:text-6xl">
@@ -97,7 +99,10 @@ export default function CardGrid({
 
   return (
     <>
-      <section className="bg-white px-6 py-24 text-[#191919] dark:bg-[#191919] dark:text-white md:px-10">
+      <section
+        id="development-areas"
+        className="scroll-mt-32 bg-white px-6 py-24 text-[#191919] dark:bg-[#191919] dark:text-white md:px-10"
+      >
         <div className="mx-auto max-w-[1408px]">
           <div className="text-center">
             <h2 className="text-5xl font-bold md:text-6xl">Development Areas</h2>
@@ -140,12 +145,14 @@ export default function CardGrid({
       </section>
 
       <ArticleSection
+        id="featured-content"
         title="Featured Content"
         subtitle="Handpicked articles to accelerate your growth"
         articles={featuredItems.slice(0, 3)}
       />
 
       <ArticleSection
+        id="trending-now"
         title="Trending Now"
         subtitle="Most popular content from our community"
         articles={trendingItems.slice(0, 2)}
@@ -153,7 +160,10 @@ export default function CardGrid({
         className="bg-white dark:bg-[#191919]"
       />
 
-      <section className="bg-[#7427b3] px-6 py-28 text-center text-white md:px-10">
+      <section
+        id="stay-informed"
+        className="scroll-mt-32 bg-[#7427b3] px-6 py-28 text-center text-white md:px-10"
+      >
         <div className="mx-auto max-w-5xl">
           <Mail className="mx-auto" size={72} strokeWidth={2.4} />
           <h2 className="mt-12 text-5xl font-bold md:text-6xl">Stay Informed</h2>
@@ -164,7 +174,10 @@ export default function CardGrid({
         </div>
       </section>
 
-      <section className="bg-[#f7f7f7] px-6 py-24 dark:bg-[#222] md:px-10">
+      <section
+        id="ecosystem"
+        className="scroll-mt-32 bg-[#f7f7f7] px-6 py-24 dark:bg-[#222] md:px-10"
+      >
         <div className="mx-auto max-w-[1408px] rounded-3xl bg-[#191919] p-10 text-white md:p-14">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>

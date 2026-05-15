@@ -1,9 +1,8 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { developmentAreas, featuredArticles } from "@/lib/content";
+import { developmentAreas } from "@/lib/content";
 
 const toneClasses = {
   purple: "bg-[#f1e8f8] text-[#7427b3]",
@@ -17,29 +16,23 @@ export default function DevelopmentAreasPage() {
     <main className="min-h-screen bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
       <Navbar showHero={false} />
 
-      <section className="relative overflow-hidden bg-[#7427b3] px-6 py-24 text-center text-white md:px-10 lg:py-32">
+      <section className="relative overflow-hidden bg-[#7427b3] px-6 py-20 text-center text-white md:px-10 lg:py-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(223,187,53,0.28),transparent_30%),radial-gradient(circle_at_72%_58%,rgba(255,255,255,0.22),transparent_36%)] animate-jmo-soft-pulse" />
-        <div className="relative mx-auto max-w-5xl animate-jmo-fade-up">
-          <p className="text-sm font-black uppercase tracking-[0.32em] text-[#dfbb35]">
+        <div className="relative mx-auto max-w-5xl">
+          <h1 className="text-5xl font-black leading-tight md:text-7xl">
             Development Areas
-          </p>
-          <h1 className="mt-7 text-5xl font-black leading-tight md:text-7xl">
-            Explore structured paths for holistic growth.
           </h1>
-          <p className="mx-auto mt-7 max-w-4xl text-2xl font-medium leading-10 text-white/90">
-            Choose from seven development categories designed to strengthen your
-            career, mindset, skills, relationships, and impact.
+          <p className="mx-auto mt-6 max-w-4xl text-2xl leading-10 text-white/90">
+            Explore our comprehensive range of development categories designed to support your
+            holistic growth
           </p>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:px-10">
+      <section className="px-6 py-16 md:px-10 md:py-20">
         <div className="mx-auto grid max-w-[1408px] gap-8 md:grid-cols-2 xl:grid-cols-3">
           {developmentAreas.map((area) => {
             const Icon = area.icon;
-            const count = featuredArticles.filter(
-              (article) => article.area === area.title,
-            ).length;
 
             return (
               <Link
@@ -48,25 +41,16 @@ export default function DevelopmentAreasPage() {
                 className="group rounded-[22px] border border-[#e4e4e4] bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition hover:-translate-y-1 hover:border-[#7427b3]/35 hover:shadow-[0_18px_40px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#222]"
               >
                 <span
-                  className={`grid size-20 place-items-center rounded-2xl ${
+                  className={`grid size-16 place-items-center rounded-2xl ${
                     toneClasses[area.tone as keyof typeof toneClasses]
                   }`}
                 >
-                  <Icon size={36} />
+                  <Icon size={30} />
                 </span>
-                <h2 className="mt-8 text-3xl font-black leading-tight">{area.title}</h2>
+                <h2 className="mt-8 text-[2rem] font-black leading-tight">{area.title}</h2>
                 <p className="mt-5 text-xl leading-8 text-[#707070] dark:text-white/65">
                   {area.description}
                 </p>
-                <div className="mt-9 flex items-center justify-between border-t border-[#ececec] pt-6 dark:border-white/10">
-                  <span className="text-base font-bold text-[#707070] dark:text-white/55">
-                    {count || 1}+ resources
-                  </span>
-                  <span className="inline-flex items-center gap-2 text-base font-black text-[#7427b3]">
-                    Explore
-                    <ArrowRight size={18} />
-                  </span>
-                </div>
               </Link>
             );
           })}
