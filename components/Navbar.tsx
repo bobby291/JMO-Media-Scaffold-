@@ -17,7 +17,6 @@ const heroWords = ["Grow,", "Learn,", "and", "Build", "Your", "Future"];
 export default function Navbar({ showHero = true }: { showHero?: boolean }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const pathname = usePathname();
-  const isHomepage = pathname === "/";
 
   function isActive(href: string) {
     if (href === "/") {
@@ -28,22 +27,6 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
   }
 
   function resolveHref(href: string) {
-    if (!isHomepage || !showHero) {
-      return href;
-    }
-
-    if (href === "/") {
-      return "#top";
-    }
-
-    if (href === "/articles") {
-      return "#featured-content";
-    }
-
-    if (href === "/development-areas") {
-      return "#development-areas";
-    }
-
     return href;
   }
 
