@@ -50,15 +50,31 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           image: user.image,
           role: user.role,
+          emailVerified: user.emailVerified?.toISOString() ?? null,
         };
       },
     }),
   ],
   callbacks: {
+    signIn({ user }) {
+      if ("emailVerified" in user && !user.emailVerified && user.email) {
+        return `/verify-email?email=${encodeURIComponent(user.email)}`;
+      }
+
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.emailVerified =
+          "emailVerified" in user
+            ? typeof user.emailVerified === "string"
+              ? user.emailVerified
+              : user.emailVerified instanceof Date
+                ? user.emailVerified.toISOString()
+                : null
+            : null;
       }
 
       return token;
@@ -67,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.emailVerified = token.emailVerified;
       }
 
       return session;

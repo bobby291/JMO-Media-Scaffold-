@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { ArrowLeft, BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 
 const roles = [
   {
@@ -36,15 +35,13 @@ export default function SignupPage() {
 
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: form.get("name"),
         email,
-        password,
+        password: form.get("password"),
         role: selectedRole,
       }),
     });
@@ -56,15 +53,14 @@ export default function SignupPage() {
       return;
     }
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/dashboard",
-      redirect: false,
-    });
-
     setLoading(false);
-    window.location.href = result?.url ?? "/dashboard";
+    const body = await response.json();
+
+    if (body?.verificationUrl && typeof window !== "undefined") {
+      window.sessionStorage.setItem("jmo-email-verify-url", body.verificationUrl);
+    }
+
+    window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
   }
 
   return (

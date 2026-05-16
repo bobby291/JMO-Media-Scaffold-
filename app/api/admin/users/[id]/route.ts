@@ -8,6 +8,8 @@ const userUpdateSchema = z.object({
   role: z.enum(["READER", "CONTRIBUTOR", "EDITOR", "ADMIN"]).optional(),
   bio: z.string().trim().max(280).optional(),
   name: z.string().trim().min(2).max(80).optional(),
+  image: z.string().trim().url().optional(),
+  emailVerified: z.boolean().optional(),
 });
 
 type Params = {
@@ -35,6 +37,13 @@ export async function PATCH(request: Request, { params }: Params) {
         role: payload.role,
         bio: payload.bio,
         name: payload.name,
+        image: payload.image,
+        emailVerified:
+          payload.emailVerified === undefined
+            ? undefined
+            : payload.emailVerified
+              ? new Date()
+              : null,
       },
       select: {
         id: true,
@@ -42,6 +51,8 @@ export async function PATCH(request: Request, { params }: Params) {
         email: true,
         role: true,
         bio: true,
+        image: true,
+        emailVerified: true,
         createdAt: true,
         _count: {
           select: {

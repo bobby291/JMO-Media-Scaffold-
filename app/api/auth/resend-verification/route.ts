@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/db/prisma";
 import { handleRouteError, ok } from "@/lib/api";
 import {
-  createPasswordResetToken,
-  passwordResetIdentifier,
-} from "@/lib/auth/password-reset";
+  createEmailVerificationToken,
+  emailVerificationIdentifier,
+} from "@/lib/auth/email-verification";
 import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
@@ -18,18 +18,18 @@ export async function POST(request: Request) {
     const payload = forgotPasswordSchema.parse(await request.json());
     const user = await prisma.user.findUnique({
       where: { email: payload.email },
-      select: { id: true, email: true, passwordHash: true },
+      select: { id: true, email: true, emailVerified: true },
     });
 
-    if (!user?.passwordHash) {
+    if (!user || user.emailVerified) {
       return ok({
         message:
-          "If that email exists in the system, a password reset link has been prepared.",
+          "If that email exists and still needs verification, a verification link has been prepared.",
       });
     }
 
-    const { token, hashedToken, expires } = createPasswordResetToken();
-    const identifier = passwordResetIdentifier(user.email);
+    const { token, hashedToken, expires } = createEmailVerificationToken();
+    const identifier = emailVerificationIdentifier(user.email);
 
     await prisma.verificationToken.deleteMany({
       where: { identifier },
@@ -44,15 +44,15 @@ export async function POST(request: Request) {
     });
 
     const origin = new URL(request.url).origin;
-    const resetUrl = `${origin}/reset-password?email=${encodeURIComponent(
+    const verificationUrl = `${origin}/verify-email?email=${encodeURIComponent(
       user.email,
     )}&token=${encodeURIComponent(token)}`;
 
     return ok({
       message:
-        "If that email exists in the system, a password reset link has been prepared.",
-      resetUrl:
-        process.env.NODE_ENV !== "production" ? resetUrl : undefined,
+        "If that email exists and still needs verification, a verification link has been prepared.",
+      verificationUrl:
+        process.env.NODE_ENV !== "production" ? verificationUrl : undefined,
     });
   } catch (error) {
     return handleRouteError(error);

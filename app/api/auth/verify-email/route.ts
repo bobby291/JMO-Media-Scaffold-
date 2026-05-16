@@ -1,13 +1,11 @@
-import bcrypt from "bcryptjs";
-
 import { prisma } from "@/lib/db/prisma";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import {
-  hashPasswordResetToken,
-  passwordResetIdentifier,
-} from "@/lib/auth/password-reset";
+  emailVerificationIdentifier,
+  hashEmailVerificationToken,
+} from "@/lib/auth/email-verification";
 import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
-import { resetPasswordSchema } from "@/lib/validation/auth";
+import { verifyEmailSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
   try {
@@ -15,9 +13,9 @@ export async function POST(request: Request) {
       return fail(databaseConfigMessage(), 503);
     }
 
-    const payload = resetPasswordSchema.parse(await request.json());
-    const hashedToken = hashPasswordResetToken(payload.token);
-    const identifier = passwordResetIdentifier(payload.email);
+    const payload = verifyEmailSchema.parse(await request.json());
+    const identifier = emailVerificationIdentifier(payload.email);
+    const hashedToken = hashEmailVerificationToken(payload.token);
 
     const tokenRecord = await prisma.verificationToken.findUnique({
       where: {
@@ -29,21 +27,19 @@ export async function POST(request: Request) {
     });
 
     if (!tokenRecord || tokenRecord.expires < new Date()) {
-      return fail("This password reset link is invalid or has expired", 400);
+      return fail("This verification link is invalid or has expired", 400);
     }
-
-    const passwordHash = await bcrypt.hash(payload.password, 12);
 
     await prisma.user.update({
       where: { email: payload.email },
-      data: { passwordHash },
+      data: { emailVerified: new Date() },
     });
 
     await prisma.verificationToken.deleteMany({
       where: { identifier },
     });
 
-    return ok({ message: "Password updated successfully." });
+    return ok({ message: "Email verified successfully." });
   } catch (error) {
     return handleRouteError(error);
   }

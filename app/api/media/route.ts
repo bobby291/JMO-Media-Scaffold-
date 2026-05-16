@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import { canWrite } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db/prisma";
+import { normalizeDriveUrl } from "@/lib/media";
 import { mediaCreateSchema } from "@/lib/validation/media";
 
 export async function GET() {
@@ -49,14 +50,18 @@ export async function POST(request: Request) {
     }
 
     const payload = mediaCreateSchema.parse(await request.json());
+    const normalizedUrl = normalizeDriveUrl(payload.url);
+    const normalizedThumbnailUrl = payload.thumbnailUrl
+      ? normalizeDriveUrl(payload.thumbnailUrl)
+      : undefined;
 
     const media = await prisma.mediaAsset.create({
       data: {
         articleId: payload.articleId,
         uploadedById: session.user.id,
         type: payload.type,
-        url: payload.url,
-        thumbnailUrl: payload.thumbnailUrl,
+        url: normalizedUrl,
+        thumbnailUrl: normalizedThumbnailUrl,
         title: payload.title,
         caption: payload.caption,
         altText: payload.altText,

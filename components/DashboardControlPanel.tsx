@@ -38,8 +38,10 @@ type DashboardUser = {
   id: string;
   name: string | null;
   email: string;
+  image?: string | null;
   role: UserRole;
   bio: string | null;
+  emailVerified?: string | null;
   createdAt: string;
   articleCount: number;
   commentCount: number;
@@ -141,9 +143,15 @@ type EditableMediaAsset = Pick<
   "id" | "articleId" | "type" | "url" | "thumbnailUrl" | "title" | "caption" | "altText"
 >;
 
+type EditableManagedUser = Pick<
+  DashboardUser,
+  "id" | "name" | "bio" | "image" | "role" | "emailVerified" | "email"
+>;
+
 const statusOptions: ArticleStatus[] = ["DRAFT", "REVIEW", "PUBLISHED", "ARCHIVED"];
 const typeOptions: ArticleType[] = ["ARTICLE", "NEWS", "EDITORIAL", "MEDIA"];
 const mediaTypeOptions: MediaType[] = ["IMAGE", "VIDEO", "AUDIO", "DOCUMENT", "EMBED"];
+const mediaSourceOptions = ["URL", "UPLOAD", "DRIVE"] as const;
 
 function formatDate(input?: string | null) {
   if (!input) {
@@ -165,6 +173,10 @@ function formatDateTime(input: string) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(input));
+}
+
+function isVerified(timestamp?: string | null) {
+  return Boolean(timestamp);
 }
 
 function statusTone(status: ArticleStatus) {
@@ -246,6 +258,16 @@ export default function DashboardControlPanel({
   const [mediaQuery, setMediaQuery] = React.useState("");
   const [mediaTypeFilter, setMediaTypeFilter] = React.useState<"ALL" | MediaType>("ALL");
   const [activeMedia, setActiveMedia] = React.useState<EditableMediaAsset | null>(null);
+  const [activeManagedUser, setActiveManagedUser] = React.useState<EditableManagedUser | null>(
+    null,
+  );
+  const [profileForm, setProfileForm] = React.useState({
+    name: user.name ?? "",
+    bio: user.bio ?? "",
+    image: user.image ?? "",
+    currentPassword: "",
+    newPassword: "",
+  });
   const [mediaForm, setMediaForm] = React.useState({
     type: "IMAGE" as MediaType,
     url: "",
@@ -255,6 +277,9 @@ export default function DashboardControlPanel({
     altText: "",
     articleId: "",
   });
+  const [mediaSource, setMediaSource] = React.useState<(typeof mediaSourceOptions)[number]>("URL");
+  const [driveUrl, setDriveUrl] = React.useState("");
+  const [uploadFile, setUploadFile] = React.useState<File | null>(null);
 
   const canEdit = user.role === "EDITOR" || user.role === "ADMIN";
   const isAdmin = user.role === "ADMIN";
@@ -491,6 +516,8 @@ export default function DashboardControlPanel({
               role: payload.user.role,
               bio: payload.user.bio,
               name: payload.user.name,
+              image: payload.user.image,
+              emailVerified: payload.user.emailVerified,
             }
           : item,
       ),
@@ -552,6 +579,45 @@ export default function DashboardControlPanel({
     setActionNotice("Comment deleted.");
   }
 
+  async function handleProfileUpdate(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setActionError("");
+    setActionNotice("");
+    setBusyKey("profile:update");
+
+    const response = await fetch("/api/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: profileForm.name,
+        bio: profileForm.bio || undefined,
+        image: profileForm.image || undefined,
+        currentPassword: profileForm.currentPassword || undefined,
+        newPassword: profileForm.newPassword || undefined,
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    setBusyKey("");
+
+    if (!response.ok) {
+      setActionError(payload?.error ?? "Unable to update your profile");
+      return;
+    }
+
+    setProfileForm((current) => ({
+      ...current,
+      name: payload.user.name ?? "",
+      bio: payload.user.bio ?? "",
+      image: payload.user.image ?? "",
+      currentPassword: "",
+      newPassword: "",
+    }));
+    setActionNotice("Your profile settings were updated.");
+    router.refresh();
+  }
+
   async function handleCreateMedia(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -559,19 +625,38 @@ export default function DashboardControlPanel({
     setActionNotice("");
     setBusyKey("media:create");
 
-    const response = await fetch("/api/media", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: mediaForm.type,
-        url: mediaForm.url,
-        thumbnailUrl: mediaForm.thumbnailUrl || undefined,
-        title: mediaForm.title || undefined,
-        caption: mediaForm.caption || undefined,
-        altText: mediaForm.altText || undefined,
-        articleId: mediaForm.articleId || undefined,
-      }),
-    });
+    const response =
+      mediaSource === "UPLOAD"
+        ? await (() => {
+            const formData = new FormData();
+            if (uploadFile) {
+              formData.set("file", uploadFile);
+            }
+            formData.set("type", mediaForm.type);
+            formData.set("title", mediaForm.title);
+            formData.set("caption", mediaForm.caption);
+            formData.set("altText", mediaForm.altText);
+            formData.set("thumbnailUrl", mediaForm.thumbnailUrl);
+            formData.set("articleId", mediaForm.articleId);
+
+            return fetch("/api/media/upload", {
+              method: "POST",
+              body: formData,
+            });
+          })()
+        : await fetch("/api/media", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: mediaForm.type,
+              url: mediaSource === "DRIVE" ? driveUrl : mediaForm.url,
+              thumbnailUrl: mediaForm.thumbnailUrl || undefined,
+              title: mediaForm.title || undefined,
+              caption: mediaForm.caption || undefined,
+              altText: mediaForm.altText || undefined,
+              articleId: mediaForm.articleId || undefined,
+            }),
+          });
 
     const payload = await response.json().catch(() => null);
     setBusyKey("");
@@ -598,6 +683,8 @@ export default function DashboardControlPanel({
       altText: "",
       articleId: "",
     });
+    setDriveUrl("");
+    setUploadFile(null);
     setActionNotice("Media asset added to the library.");
     router.refresh();
   }
@@ -669,6 +756,87 @@ export default function DashboardControlPanel({
     setActionNotice("Media asset deleted.");
   }
 
+  async function handleManagedUserUpdate(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!activeManagedUser) {
+      return;
+    }
+
+    setActionError("");
+    setActionNotice("");
+    setBusyKey(`user:edit:${activeManagedUser.id}`);
+
+    const form = new FormData(event.currentTarget);
+    const response = await fetch(`/api/admin/users/${activeManagedUser.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.get("name"),
+        bio: form.get("bio") || undefined,
+        image: form.get("image") || undefined,
+        role: form.get("role"),
+        emailVerified: form.get("emailVerified") === "on",
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    setBusyKey("");
+
+    if (!response.ok) {
+      setActionError(payload?.error ?? "Unable to update user");
+      return;
+    }
+
+    setUsers((current) =>
+      current.map((item) =>
+        item.id === activeManagedUser.id
+          ? {
+              ...item,
+              name: payload.user.name,
+              bio: payload.user.bio,
+              image: payload.user.image,
+              role: payload.user.role,
+              emailVerified: payload.user.emailVerified,
+            }
+          : item,
+      ),
+    );
+    setActiveManagedUser(null);
+    setActionNotice(`Updated ${payload.user.email}.`);
+    router.refresh();
+  }
+
+  async function handleResendVerification(email: string) {
+    setActionError("");
+    setActionNotice("");
+    setBusyKey(`verify:${email}`);
+
+    const response = await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const payload = await response.json().catch(() => null);
+    setBusyKey("");
+
+    if (!response.ok) {
+      setActionError(payload?.error ?? "Unable to prepare verification email");
+      return;
+    }
+
+    if (payload?.verificationUrl && typeof window !== "undefined") {
+      window.sessionStorage.setItem("jmo-email-verify-url", payload.verificationUrl);
+    }
+
+    setActionNotice(
+      payload?.verificationUrl
+        ? `Verification prepared for ${email}. Open the verification screen to continue.`
+        : `Verification prepared for ${email}.`,
+    );
+  }
+
   return (
     <section className="mx-auto max-w-[1408px] px-6 py-16 md:px-10">
       <div className="grid gap-8 xl:grid-cols-[0.84fr_1.16fr]">
@@ -685,10 +853,21 @@ export default function DashboardControlPanel({
                 <p className="mt-2 text-base text-[#707070] dark:text-white/65">
                   {user.email}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-[#f1e8f8] px-4 py-2 text-sm font-black text-[#7427b3]">
+                    {user.role}
+                  </span>
+                  <span
+                    className={`rounded-full px-4 py-2 text-sm font-black ${
+                      isVerified(user.emailVerified)
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-amber-50 text-amber-700"
+                    }`}
+                  >
+                    {isVerified(user.emailVerified) ? "Email verified" : "Verification pending"}
+                  </span>
+                </div>
               </div>
-              <span className="rounded-full bg-[#f1e8f8] px-4 py-2 text-sm font-black text-[#7427b3]">
-                {user.role}
-              </span>
             </div>
 
             <p className="mt-6 text-lg leading-8 text-[#525252] dark:text-white/70">
@@ -725,6 +904,100 @@ export default function DashboardControlPanel({
                 </li>
               </ul>
             </div>
+
+            <form onSubmit={handleProfileUpdate} className="mt-8 space-y-4 rounded-2xl border border-[#ececec] p-5 dark:border-white/10">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#707070] dark:text-white/55">
+                  User settings
+                </p>
+                <h3 className="mt-2 text-xl font-black">Update your profile</h3>
+              </div>
+
+              <label className="block text-sm font-semibold">
+                Full name
+                <input
+                  value={profileForm.name}
+                  onChange={(event) =>
+                    setProfileForm((current) => ({ ...current, name: event.target.value }))
+                  }
+                  className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                />
+              </label>
+
+              <label className="block text-sm font-semibold">
+                Profile image URL
+                <input
+                  value={profileForm.image}
+                  onChange={(event) =>
+                    setProfileForm((current) => ({ ...current, image: event.target.value }))
+                  }
+                  type="url"
+                  className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                />
+              </label>
+
+              <label className="block text-sm font-semibold">
+                Bio
+                <textarea
+                  value={profileForm.bio}
+                  onChange={(event) =>
+                    setProfileForm((current) => ({ ...current, bio: event.target.value }))
+                  }
+                  className="mt-2 min-h-28 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                />
+              </label>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block text-sm font-semibold">
+                  Current password
+                  <input
+                    value={profileForm.currentPassword}
+                    onChange={(event) =>
+                      setProfileForm((current) => ({
+                        ...current,
+                        currentPassword: event.target.value,
+                      }))
+                    }
+                    type="password"
+                    className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                  />
+                </label>
+
+                <label className="block text-sm font-semibold">
+                  New password
+                  <input
+                    value={profileForm.newPassword}
+                    onChange={(event) =>
+                      setProfileForm((current) => ({
+                        ...current,
+                        newPassword: event.target.value,
+                      }))
+                    }
+                    type="password"
+                    className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                  />
+                </label>
+              </div>
+
+              {!isVerified(user.emailVerified) ? (
+                <button
+                  type="button"
+                  onClick={() => handleResendVerification(user.email)}
+                  disabled={busyKey === `verify:${user.email}`}
+                  className="rounded-xl border border-[#7427b3] px-4 py-3 text-sm font-bold text-[#7427b3] disabled:opacity-60"
+                >
+                  {busyKey === `verify:${user.email}` ? "Preparing verification..." : "Resend verification"}
+                </button>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={busyKey === "profile:update"}
+                className="rounded-xl bg-[#7427b3] px-5 py-3 font-semibold text-white disabled:opacity-60"
+              >
+                {busyKey === "profile:update" ? "Saving..." : "Save profile"}
+              </button>
+            </form>
           </div>
 
           {canEdit ? <CreateArticleForm categories={categories} /> : null}
@@ -1040,6 +1313,20 @@ export default function DashboardControlPanel({
                         <p className="mt-1 text-sm text-[#707070] dark:text-white/55">
                           {managedUser.email}
                         </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-[#f1e8f8] px-3 py-1 text-xs font-black text-[#7427b3]">
+                            {managedUser.role}
+                          </span>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-black ${
+                              isVerified(managedUser.emailVerified)
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-amber-50 text-amber-700"
+                            }`}
+                          >
+                            {isVerified(managedUser.emailVerified) ? "Verified" : "Pending verification"}
+                          </span>
+                        </div>
                         <div className="mt-3 flex flex-wrap gap-4 text-sm text-[#707070] dark:text-white/55">
                           <span>{managedUser.articleCount} articles</span>
                           <span>{managedUser.commentCount} comments</span>
@@ -1047,19 +1334,48 @@ export default function DashboardControlPanel({
                         </div>
                       </div>
 
-                      <select
-                        value={managedUser.role}
-                        onChange={(event) =>
-                          handleUserRoleChange(managedUser.id, event.target.value as UserRole)
-                        }
-                        disabled={busyKey.startsWith(`user:${managedUser.id}:`)}
-                        className="min-h-12 rounded-xl border border-[#d7d7d7] px-4 outline-none dark:border-white/10 dark:bg-[#191919]"
-                      >
-                        <option value="READER">READER</option>
-                        <option value="CONTRIBUTOR">CONTRIBUTOR</option>
-                        <option value="EDITOR">EDITOR</option>
-                        <option value="ADMIN">ADMIN</option>
-                      </select>
+                      <div className="flex flex-wrap gap-2">
+                        <select
+                          value={managedUser.role}
+                          onChange={(event) =>
+                            handleUserRoleChange(managedUser.id, event.target.value as UserRole)
+                          }
+                          disabled={busyKey.startsWith(`user:${managedUser.id}:`)}
+                          className="min-h-12 rounded-xl border border-[#d7d7d7] px-4 outline-none dark:border-white/10 dark:bg-[#191919]"
+                        >
+                          <option value="READER">READER</option>
+                          <option value="CONTRIBUTOR">CONTRIBUTOR</option>
+                          <option value="EDITOR">EDITOR</option>
+                          <option value="ADMIN">ADMIN</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActiveManagedUser({
+                              id: managedUser.id,
+                              email: managedUser.email,
+                              name: managedUser.name,
+                              bio: managedUser.bio,
+                              image: managedUser.image ?? null,
+                              role: managedUser.role,
+                              emailVerified: managedUser.emailVerified ?? null,
+                            })
+                          }
+                          className="rounded-xl border border-[#d7d7d7] px-4 py-3 text-sm font-semibold dark:border-white/10"
+                        >
+                          Edit profile
+                        </button>
+                        {!isVerified(managedUser.emailVerified) ? (
+                          <button
+                            type="button"
+                            onClick={() => handleResendVerification(managedUser.email)}
+                            disabled={busyKey === `verify:${managedUser.email}`}
+                            className="rounded-xl border border-[#7427b3] px-4 py-3 text-sm font-semibold text-[#7427b3] disabled:opacity-60"
+                          >
+                            {busyKey === `verify:${managedUser.email}` ? "Preparing..." : "Resend verification"}
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1084,6 +1400,27 @@ export default function DashboardControlPanel({
               </p>
 
               <form onSubmit={handleCreateMedia} className="mt-6 grid gap-4">
+                <div className="flex flex-wrap gap-3">
+                  {mediaSourceOptions.map((source) => (
+                    <button
+                      key={source}
+                      type="button"
+                      onClick={() => setMediaSource(source)}
+                      className={`rounded-full px-4 py-2 text-sm font-black ${
+                        mediaSource === source
+                          ? "bg-[#7427b3] text-white"
+                          : "bg-[#f1e8f8] text-[#7427b3]"
+                      }`}
+                    >
+                      {source === "URL"
+                        ? "External URL"
+                        : source === "UPLOAD"
+                          ? "Upload from device"
+                          : "Google Drive"}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="block font-semibold">
                     Asset type
@@ -1124,18 +1461,33 @@ export default function DashboardControlPanel({
                   </label>
                 </div>
 
-                <label className="block font-semibold">
-                  Media URL
-                  <input
-                    value={mediaForm.url}
-                    onChange={(event) =>
-                      setMediaForm((current) => ({ ...current, url: event.target.value }))
-                    }
-                    required
-                    type="url"
-                    className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
-                  />
-                </label>
+                {mediaSource === "UPLOAD" ? (
+                  <label className="block font-semibold">
+                    Upload from local device
+                    <input
+                      onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
+                      required
+                      type="file"
+                      accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt"
+                      className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#7427b3] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                    />
+                  </label>
+                ) : (
+                  <label className="block font-semibold">
+                    {mediaSource === "DRIVE" ? "Google Drive share URL" : "Media URL"}
+                    <input
+                      value={mediaSource === "DRIVE" ? driveUrl : mediaForm.url}
+                      onChange={(event) =>
+                        mediaSource === "DRIVE"
+                          ? setDriveUrl(event.target.value)
+                          : setMediaForm((current) => ({ ...current, url: event.target.value }))
+                      }
+                      required
+                      type="url"
+                      className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+                    />
+                  </label>
+                )}
 
                 <label className="block font-semibold">
                   Thumbnail URL
@@ -1747,6 +2099,104 @@ export default function DashboardControlPanel({
                   className="rounded-xl bg-[#7427b3] px-5 py-3 font-semibold text-white disabled:opacity-60"
                 >
                   {busyKey === `media:edit:${activeMedia.id}` ? "Saving..." : "Save media"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+
+      {activeManagedUser ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-auto rounded-[28px] bg-white p-7 shadow-[0_24px_80px_rgba(0,0,0,0.25)] dark:bg-[#191919]">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7427b3]">
+                  Edit user
+                </p>
+                <h2 className="mt-2 text-3xl font-black">
+                  {activeManagedUser.name ?? activeManagedUser.email}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveManagedUser(null)}
+                className="grid size-11 place-items-center rounded-full border border-[#d7d7d7] dark:border-white/10"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleManagedUserUpdate} className="mt-8 space-y-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block font-semibold">
+                  Full name
+                  <input
+                    name="name"
+                    required
+                    defaultValue={activeManagedUser.name ?? ""}
+                    className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
+                  />
+                </label>
+
+                <label className="block font-semibold">
+                  Role
+                  <select
+                    name="role"
+                    defaultValue={activeManagedUser.role}
+                    className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
+                  >
+                    <option value="READER">READER</option>
+                    <option value="CONTRIBUTOR">CONTRIBUTOR</option>
+                    <option value="EDITOR">EDITOR</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="block font-semibold">
+                Profile image URL
+                <input
+                  name="image"
+                  type="url"
+                  defaultValue={activeManagedUser.image ?? ""}
+                  className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
+                />
+              </label>
+
+              <label className="block font-semibold">
+                Bio
+                <textarea
+                  name="bio"
+                  defaultValue={activeManagedUser.bio ?? ""}
+                  className="mt-2 min-h-24 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
+                />
+              </label>
+
+              <label className="flex items-center gap-3 rounded-xl border border-[#d7d7d7] px-4 py-4 text-sm font-semibold dark:border-white/10">
+                <input
+                  name="emailVerified"
+                  type="checkbox"
+                  defaultChecked={isVerified(activeManagedUser.emailVerified)}
+                  className="size-4 accent-[#7427b3]"
+                />
+                Mark email as verified
+              </label>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveManagedUser(null)}
+                  className="rounded-xl border border-[#d7d7d7] px-5 py-3 font-semibold dark:border-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={busyKey === `user:edit:${activeManagedUser.id}`}
+                  className="rounded-xl bg-[#7427b3] px-5 py-3 font-semibold text-white disabled:opacity-60"
+                >
+                  {busyKey === `user:edit:${activeManagedUser.id}` ? "Saving..." : "Save user"}
                 </button>
               </div>
             </form>

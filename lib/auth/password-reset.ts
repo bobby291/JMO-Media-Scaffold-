@@ -1,5 +1,7 @@
 import { createHash, randomBytes } from "crypto";
 
+const PASSWORD_RESET_PREFIX = "password-reset:";
+
 export function createPasswordResetToken() {
   const token = randomBytes(32).toString("hex");
   const hashedToken = hashPasswordResetToken(token);
@@ -10,4 +12,8 @@ export function createPasswordResetToken() {
 
 export function hashPasswordResetToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
+}
+
+export function passwordResetIdentifier(email: string) {
+  return `${PASSWORD_RESET_PREFIX}${email.toLowerCase()}`;
 }
