@@ -20,10 +20,10 @@ screen toggle.
 
 ## Setup
 
-1. Copy `.env.example` to `.env`.
+1. Copy `.env.example` to `.env.local`.
 2. Set `DATABASE_URL` to your Neon connection string.
 3. Set `NEXTAUTH_SECRET` to a strong random value.
-4. Set `NEXTAUTH_URL` to your local or deployed app URL.
+4. Set `NEXTAUTH_URL` to your local or deployed app URL, for example `http://localhost:3000`.
 5. Install dependencies:
 
 ```bash
@@ -52,7 +52,9 @@ npm run dev
 - `/articles` - Article index placeholder wired for API integration.
 - `/articles/[slug]` - Article detail placeholder.
 - `/about` - Platform overview.
-- `/login` - Credentials login page.
+- `/login` - Credentials login page with forgot-password link.
+- `/forgot-password` - Password reset request page.
+- `/reset-password` - Password reset completion page.
 - `/join` - Public JMO Community signup with benefits and interest selection.
 - `/signup` - Staff/dashboard registration page with contributor, editor, and admin role selection.
 - `/dashboard` - Editorial dashboard placeholder.
@@ -81,6 +83,8 @@ npm run dev
 ## API Surface
 
 - `POST /api/auth/register` creates a user with a selected role.
+- `POST /api/auth/forgot-password` creates a password reset token and returns a reset URL in development.
+- `POST /api/auth/reset-password` resets a password using the verified token flow.
 - `GET /api/me` returns the current authenticated user.
 - `GET /api/articles` lists published articles by default.
 - `POST /api/articles` creates articles, news, editorials, and media posts.
@@ -90,15 +94,24 @@ npm run dev
 - `GET /api/articles/:slug/comments` lists approved comments.
 - `POST /api/articles/:slug/comments` adds authenticated comments.
 - `GET /api/categories` lists categories.
-- `POST /api/categories` creates categories for editors and admins.
+- `POST /api/categories` creates categories for admins.
+- `GET /api/media` lists shared media library assets for editors/admins.
+- `POST /api/media` creates shared media assets for editors/admins.
+- `PATCH /api/media/:id` updates media asset metadata and article association.
+- `DELETE /api/media/:id` deletes a media asset.
+- `GET /api/admin/users` lists users for admin management.
+- `PATCH /api/admin/users/:id` reassigns user roles or updates profile fields.
+- `GET /api/admin/comments` lists moderation items for admins.
+- `PATCH /api/admin/comments/:id` approves or returns a comment to moderation.
+- `DELETE /api/admin/comments/:id` deletes a moderated comment.
 - `POST /api/newsletter` stores or updates a community/newsletter subscription with optional name and interests.
 
 ## Roles
 
-- `READER`: can read and comment.
-- `CONTRIBUTOR`: can create draft or review posts.
-- `EDITOR`: can publish and manage articles/categories.
-- `ADMIN`: full editorial control.
+- `READER`: basic reading access.
+- `CONTRIBUTOR`: read, share, comment, and maintain a contributor profile.
+- `EDITOR`: create, edit, review, and publish content plus manage the media library.
+- `ADMIN`: full platform control including user management, comment moderation, categories, analytics, and publishing.
 
 ## Database
 
@@ -110,6 +123,17 @@ The Prisma schema includes:
 
 Prisma 7 uses `prisma.config.ts` for datasource configuration. The schema is
 configured for Postgres/Neon.
+
+## Runtime Requirements
+
+- A working `DATABASE_URL` is required for:
+  - signup
+  - login
+  - forgot password
+  - newsletter/community signup
+  - dashboard and admin APIs
+- If `DATABASE_URL` is missing, the app now returns explicit configuration messages instead of opaque Prisma `500`s.
+- In development, NextAuth falls back to a local secret if `NEXTAUTH_SECRET` is missing, but you should still set a real value in `.env.local`.
 
 ## Useful Commands
 

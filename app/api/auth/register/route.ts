@@ -3,10 +3,15 @@ import { Prisma } from "@prisma/client";
 
 import { ok, fail, handleRouteError } from "@/lib/api";
 import { prisma } from "@/lib/db/prisma";
+import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
 import { registerSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
   try {
+    if (!hasDatabaseUrl()) {
+      return fail(databaseConfigMessage(), 503);
+    }
+
     const payload = registerSchema.parse(await request.json());
     const passwordHash = await bcrypt.hash(payload.password, 12);
 

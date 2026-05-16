@@ -3,9 +3,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/db/prisma";
+import { hasDatabaseUrl } from "@/lib/env";
 import { loginSchema } from "@/lib/validation/auth";
 
 export const authOptions: NextAuthOptions = {
+  secret:
+    process.env.NEXTAUTH_SECRET ??
+    (process.env.NODE_ENV !== "production"
+      ? "dev-only-jmo-media-nextauth-secret"
+      : undefined),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -20,7 +26,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
 
-        if (!parsed.success) {
+        if (!parsed.success || !hasDatabaseUrl()) {
           return null;
         }
 
