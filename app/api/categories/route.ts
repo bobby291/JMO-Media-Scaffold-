@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const session = await auth();
 
     if (!session?.user?.id || !canModerate(session.user.role)) {
-      return fail("Only editors and admins can manage categories", 403);
+      return fail("Only admins can manage categories", 403);
     }
 
     const payload = categorySchema.parse(await request.json());

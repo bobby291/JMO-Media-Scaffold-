@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
+import { canModerate } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db/prisma";
 import { commentCreateSchema } from "@/lib/validation/articles";
 
@@ -57,6 +58,7 @@ export async function POST(request: Request, { params }: Params) {
         articleId: article.id,
         authorId: session.user.id,
         body: payload.body,
+        approved: canModerate(session.user.role),
       },
       include: {
         author: { select: { id: true, name: true, image: true, role: true } },

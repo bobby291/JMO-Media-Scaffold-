@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     }
 
     if (!canWrite(session.user.role)) {
-      return fail("Only contributors, editors, and admins can create posts", 403);
+      return fail("Only editors and admins can create posts", 403);
     }
 
     const payload = articleCreateSchema.parse(await request.json());

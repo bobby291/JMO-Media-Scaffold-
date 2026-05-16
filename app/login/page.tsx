@@ -56,8 +56,8 @@ export default function LoginPage() {
             Continue shaping the newsroom.
           </h1>
           <p className="mt-8 max-w-xl text-2xl leading-10 text-white/90">
-            Sign in to manage drafts, publish stories, review community
-            conversations, and keep JMO Media moving.
+            Sign in to access your role-based workspace, publish stories if you
+            are an editor, or manage the platform if you are an admin.
           </p>
         </div>
       </section>

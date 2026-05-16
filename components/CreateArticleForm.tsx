@@ -3,6 +3,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
+type CategoryOption = {
+  id: string;
+  name: string;
+};
+
 const articleTypes = [
   { value: "ARTICLE", label: "Article" },
   { value: "NEWS", label: "News" },
@@ -10,7 +15,11 @@ const articleTypes = [
   { value: "MEDIA", label: "Media" },
 ];
 
-export default function CreateArticleForm() {
+export default function CreateArticleForm({
+  categories = [],
+}: {
+  categories?: CategoryOption[];
+}) {
   const router = useRouter();
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
@@ -33,6 +42,7 @@ export default function CreateArticleForm() {
         coverImage: form.get("coverImage") || undefined,
         type: form.get("type"),
         status: form.get("status"),
+        categoryId: form.get("categoryId") || undefined,
       }),
     });
 
@@ -101,6 +111,22 @@ export default function CreateArticleForm() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block font-semibold">
+            Category
+            <select
+              name="categoryId"
+              defaultValue=""
+              className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+            >
+              <option value="">Uncategorized</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block font-semibold">
             Type
             <select
               name="type"
@@ -114,8 +140,10 @@ export default function CreateArticleForm() {
               ))}
             </select>
           </label>
+        </div>
 
-          <label className="block font-semibold">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block font-semibold sm:col-start-2">
             Status
             <select
               name="status"

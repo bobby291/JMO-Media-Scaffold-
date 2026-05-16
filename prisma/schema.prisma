@@ -50,6 +50,7 @@ model User {
   accounts Account[]
   sessions Session[]
   articles Article[]
+  uploadedMedia MediaAsset[]
   comments Comment[]
 }
 
@@ -129,18 +130,24 @@ model Article {
 }
 
 model MediaAsset {
-  id        String   @id @default(cuid())
-  articleId String
-  type      MediaType
-  url       String
-  title     String?
-  caption   String?
-  altText   String?
-  createdAt DateTime @default(now())
+  id           String    @id @default(cuid())
+  articleId    String?
+  uploadedById String?
+  type         MediaType
+  url          String
+  thumbnailUrl String?
+  title        String?
+  caption      String?
+  altText      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  article    Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  uploadedBy User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
   @@index([articleId])
+  @@index([uploadedById])
+  @@index([type, createdAt])
 }
 
 model Comment {

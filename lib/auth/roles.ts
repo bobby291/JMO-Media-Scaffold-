@@ -1,7 +1,7 @@
 import type { Article, UserRole } from "@prisma/client";
 
 const publishingRoles: UserRole[] = ["EDITOR", "ADMIN"];
-const writingRoles: UserRole[] = ["CONTRIBUTOR", "EDITOR", "ADMIN"];
+const writingRoles: UserRole[] = ["EDITOR", "ADMIN"];
 
 export function canWrite(role?: UserRole | null) {
   return Boolean(role && writingRoles.includes(role));
@@ -12,7 +12,7 @@ export function canPublish(role?: UserRole | null) {
 }
 
 export function canModerate(role?: UserRole | null) {
-  return role === "EDITOR" || role === "ADMIN";
+  return role === "ADMIN";
 }
 
 export function canManageArticle(
