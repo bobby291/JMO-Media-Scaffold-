@@ -807,6 +807,41 @@ export default function DashboardControlPanel({
     router.refresh();
   }
 
+  async function handleUserDelete(managedUser: DashboardUser) {
+    if (managedUser.id === user.id) {
+      setActionError("You cannot delete your own admin account from the dashboard.");
+      setActionNotice("");
+      return;
+    }
+
+    if (!window.confirm(`Delete ${managedUser.email}? This will remove their account, authored content, comments, and active sessions.`)) {
+      return;
+    }
+
+    setActionError("");
+    setActionNotice("");
+    setBusyKey(`user:delete:${managedUser.id}`);
+
+    const response = await fetch(`/api/admin/users/${managedUser.id}`, {
+      method: "DELETE",
+    });
+
+    const payload = await response.json().catch(() => null);
+    setBusyKey("");
+
+    if (!response.ok) {
+      setActionError(payload?.error ?? "Unable to delete user");
+      return;
+    }
+
+    setUsers((current) => current.filter((item) => item.id !== managedUser.id));
+    if (activeManagedUser?.id === managedUser.id) {
+      setActiveManagedUser(null);
+    }
+    setActionNotice(`Deleted ${payload?.email ?? managedUser.email}.`);
+    router.refresh();
+  }
+
   async function handleResendVerification(email: string) {
     setActionError("");
     setActionNotice("");
@@ -1375,6 +1410,16 @@ export default function DashboardControlPanel({
                             {busyKey === `verify:${managedUser.email}` ? "Preparing..." : "Resend verification"}
                           </button>
                         ) : null}
+                        {managedUser.id !== user.id ? (
+                          <button
+                            type="button"
+                            onClick={() => handleUserDelete(managedUser)}
+                            disabled={busyKey === `user:delete:${managedUser.id}`}
+                            className="rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 disabled:opacity-60"
+                          >
+                            {busyKey === `user:delete:${managedUser.id}` ? "Deleting..." : "Delete user"}
+                          </button>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -1465,6 +1510,7 @@ export default function DashboardControlPanel({
                   <label className="block font-semibold">
                     Upload from local device
                     <input
+                      key="media-upload-input"
                       onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
                       required
                       type="file"
@@ -1476,6 +1522,7 @@ export default function DashboardControlPanel({
                   <label className="block font-semibold">
                     {mediaSource === "DRIVE" ? "Google Drive share URL" : "Media URL"}
                     <input
+                      key={`media-source-${mediaSource}`}
                       value={mediaSource === "DRIVE" ? driveUrl : mediaForm.url}
                       onChange={(event) =>
                         mediaSource === "DRIVE"
@@ -2184,6 +2231,29 @@ export default function DashboardControlPanel({
               </label>
 
               <div className="flex items-center justify-end gap-3 pt-2">
+                {activeManagedUser.id !== user.id ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleUserDelete({
+                        id: activeManagedUser.id,
+                        email: activeManagedUser.email,
+                        name: activeManagedUser.name,
+                        bio: activeManagedUser.bio ?? null,
+                        image: activeManagedUser.image ?? null,
+                        role: activeManagedUser.role,
+                        emailVerified: activeManagedUser.emailVerified ?? null,
+                        createdAt: "",
+                        articleCount: 0,
+                        commentCount: 0,
+                      })
+                    }
+                    disabled={busyKey === `user:delete:${activeManagedUser.id}`}
+                    className="rounded-xl border border-red-200 px-5 py-3 font-semibold text-red-600 disabled:opacity-60"
+                  >
+                    {busyKey === `user:delete:${activeManagedUser.id}` ? "Deleting..." : "Delete user"}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => setActiveManagedUser(null)}

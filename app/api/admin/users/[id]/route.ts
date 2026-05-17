@@ -68,3 +68,52 @@ export async function PATCH(request: Request, { params }: Params) {
     return handleRouteError(error);
   }
 }
+
+export async function DELETE(_request: Request, { params }: Params) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id || session.user.role !== "ADMIN") {
+      return fail("Only admins can delete users", 403);
+    }
+
+    const { id } = await params;
+
+    if (session.user.id === id) {
+      return fail("Admins cannot delete their own account from the dashboard", 400);
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      return fail("User not found", 404);
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.verificationToken.deleteMany({
+        where: {
+          identifier: {
+            in: [
+              `verify-email:${user.email.toLowerCase()}`,
+              `password-reset:${user.email.toLowerCase()}`,
+            ],
+          },
+        },
+      });
+
+      await tx.user.delete({
+        where: { id: user.id },
+      });
+    });
+
+    return ok({ deleted: true, userId: user.id, email: user.email });
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}
