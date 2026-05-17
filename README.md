@@ -16,6 +16,8 @@ screen toggle.
 - Prisma 7
 - Neon/Postgres
 - NextAuth credentials auth
+- Vercel Blob
+- Resend
 - Zod validation
 
 ## Setup
@@ -24,13 +26,15 @@ screen toggle.
 2. Set `DATABASE_URL` to your Neon connection string.
 3. Set `NEXTAUTH_SECRET` to a strong random value.
 4. Set `NEXTAUTH_URL` to your local or deployed app URL, for example `http://localhost:3000`.
-5. Install dependencies:
+5. For production-grade uploads, set `BLOB_READ_WRITE_TOKEN`.
+6. For email delivery, set `RESEND_API_KEY` and `EMAIL_FROM`.
+7. Install dependencies:
 
 ```bash
 npm install
 ```
 
-6. Generate Prisma Client and apply migrations:
+8. Generate Prisma Client and apply migrations:
 
 ```bash
 npm run db:generate
@@ -38,11 +42,53 @@ npm run db:migrate
 npm run db:seed
 ```
 
-7. Run the app:
+9. Run the app:
 
 ```bash
 npm run dev
 ```
+
+## Vercel Production Deploy
+
+Use Vercel with the following environment variables:
+
+```env
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
+NEXTAUTH_SECRET=your-production-secret
+NEXTAUTH_URL=https://your-domain.vercel.app
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_token
+RESEND_API_KEY=re_...
+EMAIL_FROM=JMO Media <no-reply@yourdomain.com>
+```
+
+Recommended Vercel build command:
+
+```bash
+npm run vercel-build
+```
+
+The repository also includes [vercel.json](/Users/valerian/Mista-Val/JMO-Media-Scaffold-/vercel.json) with the same build command so the project settings stay explicit in source control.
+
+That script runs:
+
+```bash
+prisma generate && prisma migrate deploy && next build
+```
+
+Pre-launch checklist:
+
+1. Add all production environment variables in Vercel.
+2. Confirm `NEXTAUTH_URL` matches the production domain exactly.
+3. Confirm `EMAIL_FROM` uses a verified Resend sender/domain.
+4. Confirm `BLOB_READ_WRITE_TOKEN` is present before testing device uploads.
+5. Trigger one production signup and verify that the verification email is actually delivered.
+6. Test password reset end to end from the live domain.
+7. Create one admin account and verify `/dashboard` can upload media, manage users, and publish content.
+
+Detailed release checklist:
+
+- [docs/production-launch-checklist.md](/Users/valerian/Mista-Val/JMO-Media-Scaffold-/docs/production-launch-checklist.md)
 
 ## Frontend Routes
 
@@ -55,6 +101,7 @@ npm run dev
 - `/login` - Credentials login page with forgot-password link.
 - `/forgot-password` - Password reset request page.
 - `/reset-password` - Password reset completion page.
+- `/verify-email` - Email verification and resend flow.
 - `/join` - Public JMO Community signup with benefits and interest selection.
 - `/signup` - Staff/dashboard registration page with contributor, editor, and admin role selection.
 - `/dashboard` - Editorial dashboard placeholder.
@@ -82,10 +129,13 @@ npm run dev
 
 ## API Surface
 
-- `POST /api/auth/register` creates a user with a selected role.
-- `POST /api/auth/forgot-password` creates a password reset token and returns a reset URL in development.
+- `POST /api/auth/register` creates a user, issues a verification token, and sends a verification email.
+- `POST /api/auth/resend-verification` regenerates and resends verification email links.
+- `POST /api/auth/verify-email` verifies an email address from the signed token.
+- `POST /api/auth/forgot-password` creates a password reset token and sends a reset email.
 - `POST /api/auth/reset-password` resets a password using the verified token flow.
 - `GET /api/me` returns the current authenticated user.
+- `PATCH /api/me` updates the current user profile, image, bio, and password.
 - `GET /api/articles` lists published articles by default.
 - `POST /api/articles` creates articles, news, editorials, and media posts.
 - `GET /api/articles/:slug` returns one public article, or a draft for its owner/editor/admin.
@@ -97,10 +147,12 @@ npm run dev
 - `POST /api/categories` creates categories for admins.
 - `GET /api/media` lists shared media library assets for editors/admins.
 - `POST /api/media` creates shared media assets for editors/admins.
+- `POST /api/media/upload` uploads a device file to Vercel Blob in production, with local fallback in development.
 - `PATCH /api/media/:id` updates media asset metadata and article association.
 - `DELETE /api/media/:id` deletes a media asset.
 - `GET /api/admin/users` lists users for admin management.
 - `PATCH /api/admin/users/:id` reassigns user roles or updates profile fields.
+- `DELETE /api/admin/users/:id` deletes a user from the platform.
 - `GET /api/admin/comments` lists moderation items for admins.
 - `PATCH /api/admin/comments/:id` approves or returns a comment to moderation.
 - `DELETE /api/admin/comments/:id` deletes a moderated comment.
@@ -132,8 +184,11 @@ configured for Postgres/Neon.
   - forgot password
   - newsletter/community signup
   - dashboard and admin APIs
+- `BLOB_READ_WRITE_TOKEN` is required in production for persistent device uploads on Vercel.
+- `RESEND_API_KEY` and `EMAIL_FROM` are required in production for verification and reset emails.
 - If `DATABASE_URL` is missing, the app now returns explicit configuration messages instead of opaque Prisma `500`s.
 - In development, NextAuth falls back to a local secret if `NEXTAUTH_SECRET` is missing, but you should still set a real value in `.env.local`.
+- In development, verification and reset APIs still expose direct URLs in the response payload when email delivery is not configured.
 
 ## Useful Commands
 

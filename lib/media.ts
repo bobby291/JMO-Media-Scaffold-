@@ -1,8 +1,11 @@
 import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { del, put } from "@vercel/blob";
 
 import type { MediaType } from "@prisma/client";
+
+import { hasBlobToken } from "@/lib/env";
 
 const DRIVE_FILE_REGEX = /\/d\/([a-zA-Z0-9_-]+)/;
 const DRIVE_OPEN_REGEX = /[?&]id=([a-zA-Z0-9_-]+)/;
@@ -47,6 +50,24 @@ export async function saveUploadedFile(file: File) {
   };
 }
 
+export async function persistUploadedFile(file: File) {
+  if (hasBlobToken()) {
+    const uploaded = await put(sanitizeFileName(file.name), file, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+
+    return {
+      url: uploaded.url,
+      fileName: file.name,
+      sizeBytes: file.size,
+      mimeType: file.type,
+    };
+  }
+
+  return saveUploadedFile(file);
+}
+
 export async function deleteLocalMediaFile(url: string) {
   if (!url.startsWith("/uploads/")) {
     return;
@@ -54,6 +75,24 @@ export async function deleteLocalMediaFile(url: string) {
 
   const filePath = path.join(process.cwd(), "public", url);
   await unlink(filePath).catch(() => undefined);
+}
+
+export function isBlobUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.endsWith(".public.blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
+
+export async function deleteStoredMediaFile(url: string) {
+  if (isBlobUrl(url) && hasBlobToken()) {
+    await del(url).catch(() => undefined);
+    return;
+  }
+
+  await deleteLocalMediaFile(url);
 }
 
 export function normalizeDriveUrl(url: string) {

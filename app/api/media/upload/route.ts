@@ -4,7 +4,8 @@ import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import { canWrite } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db/prisma";
-import { inferMediaTypeFromMime, saveUploadedFile } from "@/lib/media";
+import { blobConfigMessage, hasBlobToken } from "@/lib/env";
+import { inferMediaTypeFromMime, persistUploadedFile } from "@/lib/media";
 
 export const runtime = "nodejs";
 
@@ -33,7 +34,11 @@ export async function POST(request: Request) {
       return fail("Files larger than 25 MB are not supported yet", 422);
     }
 
-    const saved = await saveUploadedFile(file);
+    if (process.env.NODE_ENV === "production" && !hasBlobToken()) {
+      return fail(blobConfigMessage(), 503);
+    }
+
+    const saved = await persistUploadedFile(file);
     const type = ((formData.get("type") as string | null) ??
       inferMediaTypeFromMime(file.type || "application/octet-stream")) as MediaType;
 

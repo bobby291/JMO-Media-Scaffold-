@@ -4,7 +4,8 @@ import {
   createEmailVerificationToken,
   emailVerificationIdentifier,
 } from "@/lib/auth/email-verification";
-import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
+import { databaseConfigMessage, emailConfigMessage, hasDatabaseUrl, hasEmailProvider } from "@/lib/env";
+import { sendTransactionalEmail, verificationEmailContent } from "@/lib/email";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
@@ -12,6 +13,12 @@ export async function POST(request: Request) {
     if (!hasDatabaseUrl()) {
       return ok({
         message: databaseConfigMessage(),
+      });
+    }
+
+    if (process.env.NODE_ENV === "production" && !hasEmailProvider()) {
+      return ok({
+        message: emailConfigMessage(),
       });
     }
 
@@ -43,16 +50,24 @@ export async function POST(request: Request) {
       },
     });
 
-    const origin = new URL(request.url).origin;
-    const verificationUrl = `${origin}/verify-email?email=${encodeURIComponent(
+    const { verifyUrl, subject, html, text } = verificationEmailContent(
       user.email,
-    )}&token=${encodeURIComponent(token)}`;
+      token,
+      request,
+    );
+
+    await sendTransactionalEmail({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
 
     return ok({
       message:
         "If that email exists and still needs verification, a verification link has been prepared.",
       verificationUrl:
-        process.env.NODE_ENV !== "production" ? verificationUrl : undefined,
+        process.env.NODE_ENV !== "production" ? verifyUrl : undefined,
     });
   } catch (error) {
     return handleRouteError(error);

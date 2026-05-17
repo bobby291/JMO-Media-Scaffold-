@@ -7,13 +7,18 @@ import {
   emailVerificationIdentifier,
 } from "@/lib/auth/email-verification";
 import { prisma } from "@/lib/db/prisma";
-import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
+import { appBaseUrl, databaseConfigMessage, emailConfigMessage, hasDatabaseUrl, hasEmailProvider } from "@/lib/env";
+import { sendTransactionalEmail, verificationEmailContent } from "@/lib/email";
 import { registerSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
   try {
     if (!hasDatabaseUrl()) {
       return fail(databaseConfigMessage(), 503);
+    }
+
+    if (process.env.NODE_ENV === "production" && !hasEmailProvider()) {
+      return fail(emailConfigMessage(), 503);
     }
 
     const payload = registerSchema.parse(await request.json());
@@ -53,17 +58,27 @@ export async function POST(request: Request) {
       return createdUser;
     });
 
-    const origin = new URL(request.url).origin;
-    const verificationUrl = `${origin}/verify-email?email=${encodeURIComponent(
+    const { verifyUrl, subject, html, text } = verificationEmailContent(
       user.email,
-    )}&token=${encodeURIComponent(token)}`;
+      token,
+      request,
+    );
+
+    await sendTransactionalEmail({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
 
     return ok(
       {
         user,
         requiresEmailVerification: true,
         verificationUrl:
-          process.env.NODE_ENV !== "production" ? verificationUrl : undefined,
+          process.env.NODE_ENV !== "production" ? verifyUrl : undefined,
+        verificationSentTo: user.email,
+        nextStepUrl: `${appBaseUrl(request)}/verify-email?email=${encodeURIComponent(user.email)}`,
       },
       { status: 201 },
     );

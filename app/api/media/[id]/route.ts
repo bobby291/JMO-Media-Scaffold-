@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import { canWrite } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db/prisma";
-import { deleteLocalMediaFile, normalizeDriveUrl } from "@/lib/media";
+import { deleteStoredMediaFile, normalizeDriveUrl } from "@/lib/media";
 import { mediaUpdateSchema } from "@/lib/validation/media";
 
 type Params = {
@@ -57,7 +57,7 @@ export async function PATCH(request: Request, { params }: Params) {
     });
 
     if (currentAsset?.url && payload.url && currentAsset.url !== media.url) {
-      await deleteLocalMediaFile(currentAsset.url);
+      await deleteStoredMediaFile(currentAsset.url);
     }
 
     return ok({ media });
@@ -76,7 +76,7 @@ export async function DELETE(_request: Request, { params }: Params) {
 
     const { id } = await params;
     const deleted = await prisma.mediaAsset.delete({ where: { id } });
-    await deleteLocalMediaFile(deleted.url);
+    await deleteStoredMediaFile(deleted.url);
 
     return ok({ deleted: true });
   } catch (error) {

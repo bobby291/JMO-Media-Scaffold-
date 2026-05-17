@@ -4,7 +4,8 @@ import {
   createPasswordResetToken,
   passwordResetIdentifier,
 } from "@/lib/auth/password-reset";
-import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
+import { databaseConfigMessage, emailConfigMessage, hasDatabaseUrl, hasEmailProvider } from "@/lib/env";
+import { passwordResetEmailContent, sendTransactionalEmail } from "@/lib/email";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
@@ -12,6 +13,12 @@ export async function POST(request: Request) {
     if (!hasDatabaseUrl()) {
       return ok({
         message: databaseConfigMessage(),
+      });
+    }
+
+    if (process.env.NODE_ENV === "production" && !hasEmailProvider()) {
+      return ok({
+        message: emailConfigMessage(),
       });
     }
 
@@ -43,10 +50,18 @@ export async function POST(request: Request) {
       },
     });
 
-    const origin = new URL(request.url).origin;
-    const resetUrl = `${origin}/reset-password?email=${encodeURIComponent(
+    const { resetUrl, subject, html, text } = passwordResetEmailContent(
       user.email,
-    )}&token=${encodeURIComponent(token)}`;
+      token,
+      request,
+    );
+
+    await sendTransactionalEmail({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
 
     return ok({
       message:
