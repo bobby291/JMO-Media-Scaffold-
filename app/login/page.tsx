@@ -150,7 +150,7 @@ export default function LoginPage() {
           <p className="mt-8 text-lg text-[#4f5d75] dark:text-white/65">
             Need platform access?{" "}
             <Link href="/signup" className="font-black text-[#080b19] hover:text-[#7427b3] dark:text-white">
-              Create staff account
+              Create Platform Access Account
             </Link>
           </p>
           <p className="mt-3 text-base text-[#68758a] dark:text-white/55">

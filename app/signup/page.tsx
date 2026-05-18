@@ -86,7 +86,7 @@ export default function SignupPage() {
                 Platform access
               </p>
               <h1 className="mt-2 text-5xl font-black tracking-tight">
-                Create staff account
+                Create Platform Access Account
               </h1>
               <p className="mt-3 text-lg leading-8 text-[#4f5d75] dark:text-white/65">
                 Create a role-based account for contributor access, editorial publishing, or platform administration.
