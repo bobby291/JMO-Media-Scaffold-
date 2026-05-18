@@ -22,6 +22,14 @@ export async function POST(request: Request) {
     }
 
     const payload = registerSchema.parse(await request.json());
+
+    if (payload.role !== "CONTRIBUTOR") {
+      return fail(
+        "Public signup can only create Contributor accounts. Editor and Admin access must be issued internally by an administrator.",
+        403,
+      );
+    }
+
     const passwordHash = await bcrypt.hash(payload.password, 12);
     const { token, hashedToken, expires } = createEmailVerificationToken();
     const identifier = emailVerificationIdentifier(payload.email);

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import { prisma } from "@/lib/db/prisma";
+import { isApprovedPlatformEmail, platformAccessDomains, platformAccessDomainsMessage } from "@/lib/env";
 
 const userUpdateSchema = z.object({
   role: z.enum(["READER", "CONTRIBUTOR", "EDITOR", "ADMIN"]).optional(),
@@ -29,6 +30,32 @@ export async function PATCH(request: Request, { params }: Params) {
 
     if (session.user.id === id && payload.role && payload.role !== "ADMIN") {
       return fail("Admins cannot remove their own admin access here", 400);
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!currentUser) {
+      return fail("User not found", 404);
+    }
+
+    if (payload.role === "EDITOR" || payload.role === "ADMIN") {
+      if (platformAccessDomains().length === 0) {
+        return fail(platformAccessDomainsMessage(), 503);
+      }
+
+      if (!isApprovedPlatformEmail(currentUser.email)) {
+        return fail(
+          "Editor and Admin access can only be assigned to approved business email domains.",
+          400,
+        );
+      }
     }
 
     const user = await prisma.user.update({

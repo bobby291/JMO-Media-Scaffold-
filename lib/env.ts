@@ -25,3 +25,25 @@ export function emailConfigMessage() {
 export function appBaseUrl(request?: Request) {
   return process.env.NEXTAUTH_URL ?? (request ? new URL(request.url).origin : "http://localhost:3000");
 }
+
+export function platformAccessDomains() {
+  return (process.env.PLATFORM_ACCESS_EMAIL_DOMAINS ?? "")
+    .split(",")
+    .map((domain) => domain.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isApprovedPlatformEmail(email: string) {
+  const domains = platformAccessDomains();
+
+  if (domains.length === 0) {
+    return false;
+  }
+
+  const [, domain = ""] = email.toLowerCase().split("@");
+  return domains.includes(domain);
+}
+
+export function platformAccessDomainsMessage() {
+  return "Set PLATFORM_ACCESS_EMAIL_DOMAINS to a comma-separated list of approved business domains before assigning Editor or Admin roles.";
+}
