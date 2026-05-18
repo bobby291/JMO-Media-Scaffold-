@@ -5,7 +5,11 @@ import {
   passwordResetIdentifier,
 } from "@/lib/auth/password-reset";
 import { databaseConfigMessage, emailConfigMessage, hasDatabaseUrl, hasEmailProvider } from "@/lib/env";
-import { passwordResetEmailContent, sendTransactionalEmail } from "@/lib/email";
+import {
+  EmailDeliveryError,
+  passwordResetEmailContent,
+  sendTransactionalEmail,
+} from "@/lib/email";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
 export async function POST(request: Request) {
@@ -56,12 +60,37 @@ export async function POST(request: Request) {
       request,
     );
 
-    await sendTransactionalEmail({
-      to: user.email,
-      subject,
-      html,
-      text,
-    });
+    try {
+      await sendTransactionalEmail({
+        to: user.email,
+        subject,
+        html,
+        text,
+      });
+    } catch (error) {
+      console.error("Forgot-password email delivery failed", {
+        email: user.email,
+        error,
+      });
+
+      if (process.env.NODE_ENV !== "production") {
+        const message =
+          error instanceof EmailDeliveryError ? error.message : "Email delivery failed";
+
+        return ok({
+          message:
+            "Password reset email delivery failed locally. Use the generated reset link below while email is being configured.",
+          resetUrl,
+          deliveryStatus: "failed",
+          deliveryError: message,
+        });
+      }
+
+      return ok({
+        message:
+          "If that email exists in the system, a password reset link has been prepared.",
+      });
+    }
 
     return ok({
       message:

@@ -9,6 +9,13 @@ type EmailPayload = {
   text: string;
 };
 
+export class EmailDeliveryError extends Error {
+  constructor(message: string, public details?: unknown) {
+    super(message);
+    this.name = "EmailDeliveryError";
+  }
+}
+
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
 
@@ -22,21 +29,24 @@ function getResendClient() {
 export async function sendTransactionalEmail(payload: EmailPayload) {
   if (!hasEmailProvider()) {
     if (process.env.NODE_ENV === "production") {
-      throw new Error(emailConfigMessage());
+      throw new EmailDeliveryError(emailConfigMessage());
     }
 
     return { skipped: true };
   }
 
   const resend = getResendClient();
-
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: process.env.EMAIL_FROM!,
     to: payload.to,
     subject: payload.subject,
     html: payload.html,
     text: payload.text,
   });
+
+  if (result && typeof result === "object" && "error" in result && result.error) {
+    throw new EmailDeliveryError("Resend rejected the email request", result.error);
+  }
 
   return { skipped: false };
 }
