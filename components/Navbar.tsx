@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Menu, Sparkles, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -17,6 +18,9 @@ const heroWords = ["Grow,", "Learn,", "and", "Build", "Your", "Future"];
 export default function Navbar({ showHero = true }: { showHero?: boolean }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const userRole = session?.user?.role;
 
   function isActive(href: string) {
     if (href === "/") {
@@ -28,6 +32,125 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
 
   function resolveHref(href: string) {
     return href;
+  }
+
+  async function handleLogout() {
+    setMenuOpen(false);
+    await signOut({ callbackUrl: "/" });
+  }
+
+  function roleLabel(role?: string) {
+    switch (role) {
+      case "ADMIN":
+        return "Admin";
+      case "EDITOR":
+        return "Editor";
+      case "CONTRIBUTOR":
+        return "Contributor";
+      case "READER":
+        return "Reader";
+      default:
+        return null;
+    }
+  }
+
+  function renderDesktopActions() {
+    if (status === "loading") {
+      return <div className="hidden h-14 w-[280px] lg:block" aria-hidden="true" />;
+    }
+
+    if (isAuthenticated) {
+      return (
+        <div className="hidden items-center gap-3 lg:flex">
+          {roleLabel(userRole) ? (
+            <span className="rounded-full border border-[#7427b3]/20 bg-[#7427b3]/8 px-4 py-2 text-sm font-semibold text-[#7427b3] dark:border-white/10 dark:bg-white/10 dark:text-white">
+              {roleLabel(userRole)}
+            </span>
+          ) : null}
+          <Link
+            href="/dashboard"
+            className="inline-flex rounded-[14px] border border-[#7427b3]/18 px-6 py-4 text-lg font-medium text-[#7427b3] transition hover:border-[#7427b3] hover:bg-[#7427b3]/6 dark:border-white/15 dark:text-white dark:hover:bg-white/8"
+          >
+            Dashboard
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex rounded-[14px] bg-[#7427b3] px-6 py-4 text-lg font-medium text-white shadow-sm transition hover:bg-[#5d1f92]"
+          >
+            Logout
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="hidden items-center gap-3 lg:flex">
+        <Link
+          href="/login"
+          className="inline-flex rounded-[14px] border border-[#7427b3]/18 px-6 py-4 text-lg font-medium text-[#7427b3] transition hover:border-[#7427b3] hover:bg-[#7427b3]/6 dark:border-white/15 dark:text-white dark:hover:bg-white/8"
+        >
+          Login
+        </Link>
+        <Link
+          href="/join"
+          className="inline-flex rounded-[14px] bg-[#7427b3] px-8 py-4 text-lg font-medium text-white shadow-sm transition hover:bg-[#5d1f92]"
+        >
+          Join Community
+        </Link>
+      </div>
+    );
+  }
+
+  function renderMobileActions() {
+    if (status === "loading") {
+      return null;
+    }
+
+    if (isAuthenticated) {
+      return (
+        <>
+          {roleLabel(userRole) ? (
+            <span className="rounded-full border border-[#7427b3]/20 bg-[#7427b3]/8 px-4 py-2 text-sm font-semibold uppercase tracking-[0.16em] text-[#7427b3]">
+              {roleLabel(userRole)}
+            </span>
+          ) : null}
+          <Link
+            href="/dashboard"
+            onClick={() => setMenuOpen(false)}
+            className="rounded-xl border border-[#7427b3]/18 px-6 py-3 text-[#7427b3]"
+          >
+            Dashboard
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-xl bg-[#7427b3] px-6 py-3 text-white"
+          >
+            Logout
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link
+          href="/login"
+          onClick={() => setMenuOpen(false)}
+          className="rounded-xl border border-[#7427b3]/18 px-6 py-3 text-[#7427b3]"
+        >
+          Login
+        </Link>
+        <Link
+          href="/join"
+          onClick={() => setMenuOpen(false)}
+          className="rounded-xl bg-[#7427b3] px-6 py-3 text-white"
+        >
+          Join Community
+        </Link>
+      </>
+    );
   }
 
   return (
@@ -59,12 +182,7 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
             ))}
           </div>
 
-          <Link
-            href="/join"
-            className="hidden rounded-[14px] bg-[#7427b3] px-8 py-4 text-lg font-medium text-white shadow-sm transition hover:bg-[#5d1f92] lg:inline-flex"
-          >
-            Join Community
-          </Link>
+          {renderDesktopActions()}
 
           <button
             className="grid size-11 place-items-center rounded-lg border border-slate-200 lg:hidden dark:border-white/15"
@@ -88,13 +206,7 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/join"
-            onClick={() => setMenuOpen(false)}
-            className="rounded-xl bg-[#7427b3] px-6 py-3 text-white"
-          >
-            Join Community
-          </Link>
+          {renderMobileActions()}
           <button
             className="mt-4 grid size-11 place-items-center rounded-lg bg-slate-100"
             onClick={() => setMenuOpen(false)}
