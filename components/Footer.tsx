@@ -15,10 +15,10 @@ const ecosystemLinks = [
 
 const socials = [
   { label: "Facebook", icon: "facebook", href: "https://www.facebook.com/jmomedia" },
-  { label: "X", icon: "x", href: "https://x.com/jmomedia" },
-  { label: "LinkedIn", icon: "linkedin", href: "https://www.linkedin.com/company/jmo-media" },
-  { label: "Instagram", icon: "instagram", href: "https://www.instagram.com/jmomedia" },
-  { label: "YouTube", icon: "youtube", href: "https://www.youtube.com/@jmomedia" },
+  { label: "X", icon: "x", href: "#" },
+  { label: "LinkedIn", icon: "linkedin", href: "#" },
+  { label: "Instagram", icon: "instagram", href: "#" },
+  { label: "YouTube", icon: "youtube", href: "#" },
 ];
 
 function SocialIcon({ name }: { name: string }) {
@@ -120,9 +120,9 @@ export default function Footer() {
           <div>
             <h2 className="text-3xl font-bold">Contact</h2>
             <div className="mt-8 flex flex-col gap-5 text-xl font-medium text-[#a7adb8]">
-              <p>Email: info@jmomedia.com</p>
-              <p>Phone: (555) 123-4567</p>
-              <p>Location: New York, NY</p>
+              <p>Email: jmobizhub@gmail.com</p>
+              <p>Phone: +234 703 358 6251</p>
+              <p>Location: Nigeria, NG</p>
             </div>
           </div>
         </div>
