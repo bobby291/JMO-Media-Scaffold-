@@ -102,7 +102,15 @@ export default function LoginPage() {
             </label>
 
             <label className="block text-base font-bold text-[#111827] dark:text-white">
-              Password
+              <span className="flex items-center justify-between gap-4">
+                <span>Password</span>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-bold text-[#7427b3] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </span>
               <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
                 <Lock size={22} className="text-[#7427b3]" />
                 <input
@@ -142,7 +150,7 @@ export default function LoginPage() {
           <p className="mt-8 text-lg text-[#4f5d75] dark:text-white/65">
             Need platform access?{" "}
             <Link href="/signup" className="font-black text-[#080b19] hover:text-[#7427b3] dark:text-white">
-              Create staff account
+              Create Platform Access Account
             </Link>
           </p>
           <p className="mt-3 text-base text-[#68758a] dark:text-white/55">

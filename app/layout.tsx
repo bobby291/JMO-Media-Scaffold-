@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AuthProvider from "@/components/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -14,10 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth">
       <body className="min-h-full flex flex-col">
-        {children}
-        <ThemeToggle />
+        <AuthProvider>
+          {children}
+          <ThemeToggle />
+        </AuthProvider>
       </body>
     </html>
   );

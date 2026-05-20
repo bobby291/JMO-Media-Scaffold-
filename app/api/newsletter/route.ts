@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { handleRouteError, ok } from "@/lib/api";
+import { fail, handleRouteError, ok } from "@/lib/api";
 import { prisma } from "@/lib/db/prisma";
+import { databaseConfigMessage, hasDatabaseUrl } from "@/lib/env";
 
 const newsletterSchema = z.object({
   email: z.string().trim().email().toLowerCase(),
@@ -11,6 +12,10 @@ const newsletterSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    if (!hasDatabaseUrl()) {
+      return fail(databaseConfigMessage(), 503);
+    }
+
     const payload = newsletterSchema.parse(await request.json());
     const subscription = await prisma.newsletterSubscription.upsert({
       where: { email: payload.email },

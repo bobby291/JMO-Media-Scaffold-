@@ -3,23 +3,25 @@
 import { FormEvent, useState } from "react";
 import { ArrowLeft, BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 
 const roles = [
   {
     value: "CONTRIBUTOR",
     label: "Contributor",
     description: "Read, share, comment, and access a contributor profile inside the platform.",
+    publicAccess: true,
   },
   {
     value: "EDITOR",
     label: "Editor",
     description: "Create, edit, post, and publish articles, news, editorials, and media content.",
+    publicAccess: false,
   },
   {
     value: "ADMIN",
     label: "Admin",
     description: "Manage platform operations, users, categories, and editorial activity.",
+    publicAccess: false,
   },
 ];
 
@@ -36,15 +38,13 @@ export default function SignupPage() {
 
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: form.get("name"),
         email,
-        password,
+        password: form.get("password"),
         role: selectedRole,
       }),
     });
@@ -56,15 +56,14 @@ export default function SignupPage() {
       return;
     }
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/dashboard",
-      redirect: false,
-    });
-
     setLoading(false);
-    window.location.href = result?.url ?? "/dashboard";
+    const body = await response.json();
+
+    if (body?.verificationUrl && typeof window !== "undefined") {
+      window.sessionStorage.setItem("jmo-email-verify-url", body.verificationUrl);
+    }
+
+    window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
   }
 
   return (
@@ -90,10 +89,10 @@ export default function SignupPage() {
                 Platform access
               </p>
               <h1 className="mt-2 text-5xl font-black tracking-tight">
-                Create staff account
+                Create Platform Access Account
               </h1>
               <p className="mt-3 text-lg leading-8 text-[#4f5d75] dark:text-white/65">
-                Create a role-based account for contributor access, editorial publishing, or platform administration.
+                Public signup creates Contributor access. Editor and Admin roles are issued internally to approved business email accounts.
               </p>
             </div>
           </div>
@@ -157,11 +156,16 @@ export default function SignupPage() {
               <legend className="text-base font-bold text-[#111827] dark:text-white">
                 Dashboard role
               </legend>
+              <p className="mt-3 text-sm font-semibold leading-6 text-[#68758a] dark:text-white/55">
+                Public registration is limited to Contributor. Editorial and Admin access are assigned internally after verification.
+              </p>
               <div className="mt-3 grid gap-3">
                 {roles.map((role) => (
                   <label
                     key={role.value}
-                    className={`cursor-pointer rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
+                    className={`rounded-2xl border p-4 transition ${
+                      role.publicAccess ? "cursor-pointer hover:-translate-y-0.5" : "cursor-not-allowed opacity-70"
+                    } ${
                       selectedRole === role.value
                         ? "border-[#7427b3] bg-[#f6effb] shadow-[0_10px_24px_rgba(116,39,179,0.12)] dark:bg-[#7427b3]/20"
                         : "border-[#d8deea] bg-white dark:border-white/15 dark:bg-[#111]"
@@ -172,7 +176,12 @@ export default function SignupPage() {
                       name="role"
                       value={role.value}
                       checked={selectedRole === role.value}
-                      onChange={() => setSelectedRole(role.value)}
+                      onChange={() => {
+                        if (role.publicAccess) {
+                          setSelectedRole(role.value);
+                        }
+                      }}
+                      disabled={!role.publicAccess}
                       className="sr-only"
                     />
                     <span className="flex items-start gap-3">
@@ -182,7 +191,14 @@ export default function SignupPage() {
                         ) : null}
                       </span>
                       <span>
-                        <span className="block text-lg font-black">{role.label}</span>
+                        <span className="flex flex-wrap items-center gap-2 text-lg font-black">
+                          <span>{role.label}</span>
+                          {!role.publicAccess ? (
+                            <span className="rounded-full bg-[#f1e8f8] px-2.5 py-1 text-xs font-black uppercase tracking-[0.16em] text-[#7427b3]">
+                              Internal only
+                            </span>
+                          ) : null}
+                        </span>
                         <span className="mt-1 block text-base leading-7 text-[#4f5d75] dark:text-white/65">
                           {role.description}
                         </span>

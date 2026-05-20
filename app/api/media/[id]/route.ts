@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { fail, handleRouteError, ok } from "@/lib/api";
 import { canWrite } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db/prisma";
+import { deleteStoredMediaFile, normalizeDriveUrl } from "@/lib/media";
 import { mediaUpdateSchema } from "@/lib/validation/media";
 
 type Params = {
@@ -18,14 +19,20 @@ export async function PATCH(request: Request, { params }: Params) {
 
     const { id } = await params;
     const payload = mediaUpdateSchema.parse(await request.json());
+    const currentAsset = await prisma.mediaAsset.findUnique({
+      where: { id },
+      select: { url: true },
+    });
 
     const media = await prisma.mediaAsset.update({
       where: { id },
       data: {
         articleId: payload.articleId,
         type: payload.type,
-        url: payload.url,
-        thumbnailUrl: payload.thumbnailUrl,
+        url: payload.url ? normalizeDriveUrl(payload.url) : payload.url,
+        thumbnailUrl: payload.thumbnailUrl
+          ? normalizeDriveUrl(payload.thumbnailUrl)
+          : payload.thumbnailUrl,
         title: payload.title,
         caption: payload.caption,
         altText: payload.altText,
@@ -49,6 +56,10 @@ export async function PATCH(request: Request, { params }: Params) {
       },
     });
 
+    if (currentAsset?.url && payload.url && currentAsset.url !== media.url) {
+      await deleteStoredMediaFile(currentAsset.url);
+    }
+
     return ok({ media });
   } catch (error) {
     return handleRouteError(error);
@@ -64,7 +75,8 @@ export async function DELETE(_request: Request, { params }: Params) {
     }
 
     const { id } = await params;
-    await prisma.mediaAsset.delete({ where: { id } });
+    const deleted = await prisma.mediaAsset.delete({ where: { id } });
+    await deleteStoredMediaFile(deleted.url);
 
     return ok({ deleted: true });
   } catch (error) {

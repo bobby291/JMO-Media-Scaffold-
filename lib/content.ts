@@ -1,11 +1,13 @@
 import {
   Briefcase,
+  FlaskConical,
   GraduationCap,
   Heart,
   Laptop,
   Leaf,
   Lightbulb,
   PiggyBank,
+  Scale,
   Users,
 } from "lucide-react";
 
@@ -51,6 +53,20 @@ export const developmentAreas = [
     description: "Explore responsible ideas for healthier communities and a better planet.",
     icon: Leaf,
     tone: "green",
+  },
+  {
+    slug: "politics-governance",
+    title: "Politics & Governance",
+    description: "Understand public leadership, policy thinking, and the systems that shape civic life.",
+    icon: Scale,
+    tone: "purple",
+  },
+  {
+    slug: "health-sciences",
+    title: "Health & Sciences",
+    description: "Follow evidence-based health ideas, scientific literacy, and emerging research with real-world relevance.",
+    icon: FlaskConical,
+    tone: "gold",
   },
   {
     slug: "relationship-development",
@@ -433,6 +449,49 @@ export const featuredArticles: StaticArticle[] = [
     relatedSlugs: ["transformational-leadership-modern-organizations", "startup-growth-market-signals"],
   },
   {
+    slug: "civic-trust-public-leadership",
+    category: "politics",
+    area: "Politics & Governance",
+    level: "Intermediate",
+    title: "Civic Trust and the New Standard for Public Leadership",
+    excerpt:
+      "Why legitimacy, transparency, and service delivery now matter more than rhetoric for modern governance.",
+    readTime: "8 min read",
+    author: "Amara Bello",
+    date: "Apr 03, 2026",
+    image:
+      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnb3Zlcm5hbmNlJTIwcHVibGljJTIwbGVhZGVyc2hpcHxlbnwxfHx8fDE3ODAwMjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    intro:
+      "Public trust is increasingly shaped by whether institutions can communicate clearly, respond quickly, and deliver visible results.",
+    sections: [
+      {
+        heading: "Trust Is Built Through Competence",
+        body:
+          "Citizens judge leadership by how reliably public systems solve real problems. Competence, transparency, and follow-through build legitimacy more effectively than slogans.",
+      },
+      {
+        heading: "Governance Requires Clear Feedback Loops",
+        body:
+          "Healthy institutions gather signals from communities, translate them into action, and report progress in ways the public can verify.",
+        bullets: [
+          "Publish goals and measurable delivery timelines",
+          "Use citizen feedback to refine implementation priorities",
+          "Communicate tradeoffs openly when resources are limited",
+        ],
+      },
+      {
+        heading: "Leadership Beyond Elections",
+        body:
+          "Sustainable governance depends on strengthening systems, not just personalities. Public leaders create confidence when institutions continue to perform under pressure.",
+      },
+    ],
+    quote:
+      "Trust grows when public leadership is experienced as service, not spectacle.",
+    authorBio:
+      "Amara Bello writes on democratic institutions, civic participation, and the practice of accountable public leadership.",
+    relatedSlugs: ["policy-literacy-for-rising-civic-leaders", "transformational-leadership-modern-organizations"],
+  },
+  {
     slug: "startup-growth-market-signals",
     category: "business",
     area: "Professional & Business Development",
@@ -474,6 +533,49 @@ export const featuredArticles: StaticArticle[] = [
     authorBio:
       "Sarah Chen works with founders on positioning, customer development, and early growth strategy.",
     relatedSlugs: ["building-personal-brand-opens-doors", "financial-discipline-for-builders"],
+  },
+  {
+    slug: "preventive-health-habits-for-modern-work",
+    category: "health",
+    area: "Health & Sciences",
+    level: "Foundational",
+    title: "Preventive Health Habits for High-Performance Work and Life",
+    excerpt:
+      "Simple evidence-based practices that improve energy, resilience, and long-term wellbeing in demanding schedules.",
+    readTime: "7 min read",
+    author: "Dr. Leah Morgan",
+    date: "Apr 02, 2026",
+    image:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFsdGglMjBjYXJlJTIwbWVkaWNhbCUyMGNvbnN1bHRhdGlvbnxlbnwxfHx8fDE3ODAwMjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    intro:
+      "Preventive health is less about perfection and more about creating stable routines that keep the body and mind reliable under pressure.",
+    sections: [
+      {
+        heading: "Focus on the Foundational Signals",
+        body:
+          "Sleep quality, movement, nutrition, stress, and routine screening tell you far more about long-term health than reactive fixes after burnout sets in.",
+      },
+      {
+        heading: "Build Sustainable Systems",
+        body:
+          "Health habits are easier to keep when they fit your real calendar, environment, and work demands rather than an idealized routine.",
+        bullets: [
+          "Protect a consistent sleep window during the week",
+          "Schedule movement into the workday instead of hoping it appears",
+          "Use routine screening and primary care visits to catch issues early",
+        ],
+      },
+      {
+        heading: "Performance Depends on Recovery",
+        body:
+          "People who want durable output need recovery systems that are treated as seriously as ambition. Recovery is operational capacity, not a reward after collapse.",
+      },
+    ],
+    quote:
+      "Preventive health is how long-term performance stays honest.",
+    authorBio:
+      "Dr. Leah Morgan covers preventive medicine, workforce wellbeing, and the science of sustainable performance.",
+    relatedSlugs: ["science-literacy-for-everyday-medical-decisions", "ai-automation-skills-future-workplace"],
   },
   {
     slug: "cybersecurity-digital-protection",
@@ -562,6 +664,49 @@ export const featuredArticles: StaticArticle[] = [
     relatedSlugs: ["financial-discipline-for-builders", "cybersecurity-digital-protection"],
   },
   {
+    slug: "policy-literacy-for-rising-civic-leaders",
+    category: "governance",
+    area: "Politics & Governance",
+    level: "Foundational",
+    title: "Policy Literacy for Rising Civic Leaders",
+    excerpt:
+      "Learn how to read policy proposals, understand implementation risk, and participate more effectively in public decision-making.",
+    readTime: "6 min read",
+    author: "Daniel Mensah",
+    date: "Mar 26, 2026",
+    image:
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdWJsaWMlMjBwb2xpY3klMjBtZWV0aW5nfGVufDF8fHx8MTc4MDAyMDAwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+    intro:
+      "Policy literacy helps citizens and young leaders move from opinion to informed participation by understanding how ideas become implementation.",
+    sections: [
+      {
+        heading: "Read Beyond Headlines",
+        body:
+          "Policy proposals should be examined through goals, cost, delivery structure, incentives, and who will be affected most. Headlines rarely capture those layers.",
+      },
+      {
+        heading: "Implementation Is the Real Test",
+        body:
+          "A good idea can still fail when it lacks staffing, budget, timelines, coordination, or accountability. Policy literacy means learning to ask how execution will work.",
+        bullets: [
+          "Identify the agencies or institutions responsible for delivery",
+          "Check whether funding and timelines are realistic",
+          "Look for measurable outcomes, not only broad promises",
+        ],
+      },
+      {
+        heading: "Civic Participation Improves with Clarity",
+        body:
+          "The public contributes more effectively when people understand the mechanics of governance and can evaluate tradeoffs with discipline.",
+      },
+    ],
+    quote:
+      "Policy literacy turns civic passion into useful judgment.",
+    authorBio:
+      "Daniel Mensah writes about governance systems, civic education, and public-sector execution.",
+    relatedSlugs: ["civic-trust-public-leadership", "financial-discipline-for-builders"],
+  },
+  {
     slug: "creative-brainstorming-better-ideas",
     category: "social",
     area: "Educational Development",
@@ -603,6 +748,49 @@ export const featuredArticles: StaticArticle[] = [
     authorBio:
       "Amina Brooks helps teams design learning sessions, workshops, and creative collaboration systems.",
     relatedSlugs: ["education-in-the-age-of-self-directed-learning", "building-personal-brand-opens-doors"],
+  },
+  {
+    slug: "science-literacy-for-everyday-medical-decisions",
+    category: "science",
+    area: "Health & Sciences",
+    level: "Intermediate",
+    title: "Science Literacy for Everyday Medical Decisions",
+    excerpt:
+      "A practical guide to reading health claims, understanding evidence, and making more informed decisions about treatments and research headlines.",
+    readTime: "8 min read",
+    author: "Dr. Samuel Reed",
+    date: "Mar 16, 2026",
+    image:
+      "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFib3JhdG9yeSUyMGhlYWx0aHxlbnwxfHx8fDE3ODAwMjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    intro:
+      "The modern information environment makes health advice abundant, but not equally reliable. Science literacy helps you distinguish evidence from noise.",
+    sections: [
+      {
+        heading: "Look at Study Quality",
+        body:
+          "Ask whether a claim comes from a peer-reviewed study, a small sample, an observational finding, or a randomized trial. The strength of evidence matters as much as the headline.",
+      },
+      {
+        heading: "Understand Risk and Context",
+        body:
+          "Relative improvement can sound dramatic without absolute risk, side effects, or information about who the treatment was actually tested on.",
+        bullets: [
+          "Read beyond the summary when a health claim sounds absolute",
+          "Check whether results were replicated by other studies",
+          "Use clinicians and trusted institutions to interpret uncertainty",
+        ],
+      },
+      {
+        heading: "Use Science as a Decision Tool",
+        body:
+          "Science literacy is not about memorizing jargon. It is about asking better questions before making medical, lifestyle, or policy decisions.",
+      },
+    ],
+    quote:
+      "Better health decisions start with better questions about evidence.",
+    authorBio:
+      "Dr. Samuel Reed writes about public health communication, research interpretation, and science-informed decision-making.",
+    relatedSlugs: ["preventive-health-habits-for-modern-work", "education-in-the-age-of-self-directed-learning"],
   },
 ];
 

@@ -60,8 +60,10 @@ export default async function DashboardPage() {
         id: true,
         name: true,
         email: true,
+        image: true,
         role: true,
         bio: true,
+        emailVerified: true,
         createdAt: true,
         _count: {
           select: {
@@ -115,8 +117,10 @@ export default async function DashboardPage() {
             id: true,
             name: true,
             email: true,
+            image: true,
             role: true,
             bio: true,
+            emailVerified: true,
             createdAt: true,
             _count: {
               select: {
@@ -236,8 +240,10 @@ export default async function DashboardPage() {
           id: user.id,
           name: user.name,
           email: user.email,
+          image: user.image,
           role: user.role,
           bio: user.bio,
+          emailVerified: user.emailVerified?.toISOString() ?? null,
           createdAt: user.createdAt.toISOString(),
           articleCount: user._count.articles,
           commentCount: user._count.comments,
@@ -271,8 +277,10 @@ export default async function DashboardPage() {
           id: managedUser.id,
           name: managedUser.name,
           email: managedUser.email,
+          image: managedUser.image,
           role: managedUser.role,
           bio: managedUser.bio,
+          emailVerified: managedUser.emailVerified?.toISOString() ?? null,
           createdAt: managedUser.createdAt.toISOString(),
           articleCount: managedUser._count.articles,
           commentCount: managedUser._count.comments,
