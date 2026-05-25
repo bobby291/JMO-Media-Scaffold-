@@ -192,13 +192,19 @@ export default function CardGrid({
               {ecosystemLinks.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.title} className="rounded-2xl bg-white/8 p-6">
+                  <a
+                    key={item.title}
+                    href={item.href}
+                    target={item.href.startsWith("http") ? "_blank" : undefined}
+                    rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    className="block rounded-2xl bg-white/8 p-6 transition hover:bg-white/12"
+                  >
                     <Icon className="text-[#dfbb35]" size={32} />
                     <h3 className="mt-5 text-2xl font-bold">{item.title}</h3>
                     <p className="mt-3 text-base leading-7 text-white/70">
                       {item.description}
                     </p>
-                  </div>
+                  </a>
                 );
               })}
             </div>

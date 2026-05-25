@@ -5,6 +5,8 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
+import SocialAuthButtons from "@/components/SocialAuthButtons";
+
 export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -85,7 +87,17 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <form onSubmit={onSubmit} className="mt-10 space-y-6">
+          <div className="mt-10">
+            <SocialAuthButtons />
+          </div>
+
+          <div className="my-8 flex items-center gap-4 text-sm font-bold uppercase tracking-[0.18em] text-[#94a3b8]">
+            <span className="h-px flex-1 bg-[#d8deea]" />
+            <span>Or sign in with email</span>
+            <span className="h-px flex-1 bg-[#d8deea]" />
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-6">
             <label className="block text-base font-bold text-[#111827] dark:text-white">
               Email
               <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">

@@ -806,10 +806,12 @@ export const ecosystemLinks = [
     title: "JMO BIZHUB",
     description: "Business growth, entrepreneurship, and market-building resources.",
     icon: Lightbulb,
+    href: "https://www.jmobizhub.com/",
   },
   {
     title: "JMO Academy",
     description: "Learning pathways, training, and development programs.",
     icon: GraduationCap,
+    href: "/development-areas/educational-development",
   },
 ];

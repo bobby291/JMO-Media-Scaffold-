@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import { ArrowLeft, BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import Link from "next/link";
 
+import SocialAuthButtons from "@/components/SocialAuthButtons";
+
 const roles = [
   {
     value: "CONTRIBUTOR",
@@ -97,7 +99,17 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <form onSubmit={onSubmit} className="mt-10 space-y-6">
+          <div className="mt-10">
+            <SocialAuthButtons />
+          </div>
+
+          <div className="my-8 flex items-center gap-4 text-sm font-bold uppercase tracking-[0.18em] text-[#94a3b8]">
+            <span className="h-px flex-1 bg-[#d8deea]" />
+            <span>Or create with email</span>
+            <span className="h-px flex-1 bg-[#d8deea]" />
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-6">
             <label className="block text-base font-bold text-[#111827] dark:text-white">
               Full name
               <span className="mt-3 flex min-h-16 items-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-4 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
@@ -229,6 +241,9 @@ export default function SignupPage() {
             <Link href="/login" className="font-black text-[#080b19] hover:text-[#7427b3] dark:text-white">
               Login
             </Link>
+          </p>
+          <p className="mt-3 text-base text-[#68758a] dark:text-white/55">
+            Google and Facebook access will still create a Contributor account first.
           </p>
         </div>
       </section>

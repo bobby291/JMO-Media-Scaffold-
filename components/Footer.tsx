@@ -8,7 +8,7 @@ const quickLinks = [
 ];
 
 const ecosystemLinks = [
-  { href: "/development-areas/professional-business-development", label: "JMO BIZHUB" },
+  { href: "https://www.jmobizhub.com/", label: "JMO BIZHUB", external: true },
   { href: "/development-areas/educational-development", label: "JMO Academy" },
   { href: "/join", label: "Join Community" },
 ];
@@ -110,9 +110,21 @@ export default function Footer() {
             <h2 className="text-3xl font-bold">Ecosystem</h2>
             <div className="mt-8 flex flex-col gap-5 text-xl font-medium text-[#a7adb8]">
               {ecosystemLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="hover:text-white">
-                  {link.label}
-                </Link>
+                link.external ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link key={link.href} href={link.href} className="hover:text-white">
+                    {link.label}
+                  </Link>
+                )
               ))}
             </div>
           </div>

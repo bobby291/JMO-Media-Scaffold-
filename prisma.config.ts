@@ -7,7 +7,8 @@ loadEnv();
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: env("DATABASE_URL"),
+    // Prefer the pooled DATABASE_URL (recommended for deployments). Fall back to DIRECT_URL when DATABASE_URL is not set (e.g., some local setups).
+    url: env("DATABASE_URL") || env("DIRECT_URL"),
   },
   migrations: {
     path: "prisma/migrations",

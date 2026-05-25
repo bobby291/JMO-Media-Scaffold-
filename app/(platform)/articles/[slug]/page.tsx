@@ -258,12 +258,14 @@ export default async function ArticleDetailPage({
             >
               Join Community
             </Link>
-            <Link
-              href="/development-areas"
+            <a
+              href="https://www.jmobizhub.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-2xl border-2 border-white px-12 py-5 text-xl font-bold text-white"
             >
               Explore JMO BIZHUB
-            </Link>
+            </a>
           </div>
         </div>
       </section>
