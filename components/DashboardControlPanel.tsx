@@ -1458,7 +1458,7 @@ export default function DashboardControlPanel({
                       }`}
                     >
                       {source === "URL"
-                        ? "External URL"
+                        ? "Cloud storage URL"
                         : source === "UPLOAD"
                           ? "Upload from device"
                           : "Google Drive"}
@@ -1520,7 +1520,7 @@ export default function DashboardControlPanel({
                   </label>
                 ) : (
                   <label className="block font-semibold">
-                    {mediaSource === "DRIVE" ? "Google Drive share URL" : "Media URL"}
+                    {mediaSource === "DRIVE" ? "Google Drive share URL" : "Cloud storage / CDN URL"}
                     <input
                       key={`media-source-${mediaSource}`}
                       value={mediaSource === "DRIVE" ? driveUrl : mediaForm.url}
@@ -1531,6 +1531,11 @@ export default function DashboardControlPanel({
                       }
                       required
                       type="url"
+                      placeholder={
+                        mediaSource === "DRIVE"
+                          ? "https://drive.google.com/file/d/..."
+                          : "https://your-storage-or-cdn.example.com/asset.webp"
+                      }
                       className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
                     />
                   </label>

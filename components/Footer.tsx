@@ -14,7 +14,11 @@ const ecosystemLinks = [
 ];
 
 const socials = [
-  { label: "Facebook", icon: "facebook", href: "https://www.facebook.com/jmomedia" },
+  {
+    label: "Facebook",
+    icon: "facebook",
+    href: "https://www.facebook.com/JESSICAMEDIAOPINIONS?mibextid=rS40aB7S9Ucbxw6v",
+  },
   { label: "X", icon: "x", href: "#" },
   { label: "LinkedIn", icon: "linkedin", href: "#" },
   { label: "Instagram", icon: "instagram", href: "#" },

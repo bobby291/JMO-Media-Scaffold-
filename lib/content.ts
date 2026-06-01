@@ -35,8 +35,8 @@ export const developmentAreas = [
   },
   {
     slug: "financial-development",
-    title: "Financial Development",
-    description: "Learn practical money management, investing, and wealth-building principles.",
+    title: "Economic / Financial Development",
+    description: "Learn practical money management, economic literacy, investing, and wealth-building principles.",
     icon: PiggyBank,
     tone: "gold",
   },
@@ -63,8 +63,8 @@ export const developmentAreas = [
   },
   {
     slug: "health-sciences",
-    title: "Health & Sciences",
-    description: "Follow evidence-based health ideas, scientific literacy, and emerging research with real-world relevance.",
+    title: "Social Development",
+    description: "Explore civic awareness, social wellbeing, and community intelligence that improve how people grow together.",
     icon: FlaskConical,
     tone: "gold",
   },
@@ -236,7 +236,7 @@ export const featuredArticles: StaticArticle[] = [
   {
     slug: "financial-discipline-for-builders",
     category: "finance",
-    area: "Financial Development",
+    area: "Economic / Financial Development",
     level: "Foundational",
     title: "Financial Discipline for Builders, Creators, and Founders",
     excerpt:
@@ -537,44 +537,44 @@ export const featuredArticles: StaticArticle[] = [
   {
     slug: "preventive-health-habits-for-modern-work",
     category: "health",
-    area: "Health & Sciences",
+    area: "Social Development",
     level: "Foundational",
-    title: "Preventive Health Habits for High-Performance Work and Life",
+    title: "Social Intelligence Habits for Modern Communities and Teams",
     excerpt:
-      "Simple evidence-based practices that improve energy, resilience, and long-term wellbeing in demanding schedules.",
+      "Build practical habits that improve empathy, cooperation, and healthy participation across work, family, and public life.",
     readTime: "7 min read",
-    author: "Dr. Leah Morgan",
+    author: "Leah Morgan",
     date: "Apr 02, 2026",
     image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFsdGglMjBjYXJlJTIwbWVkaWNhbCUyMGNvbnN1bHRhdGlvbnxlbnwxfHx8fDE3ODAwMjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwZW9wbGUlMjB0b2dldGhlcnxlbnwxfHx8fDE3OTA4MjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
     intro:
-      "Preventive health is less about perfection and more about creating stable routines that keep the body and mind reliable under pressure.",
+      "Social development depends on the quality of our everyday habits: how we listen, collaborate, include, and respond to tension.",
     sections: [
       {
-        heading: "Focus on the Foundational Signals",
+        heading: "Start with Everyday Behaviors",
         body:
-          "Sleep quality, movement, nutrition, stress, and routine screening tell you far more about long-term health than reactive fixes after burnout sets in.",
+          "Trust is built through repeated signals. Respectful communication, reliability, and awareness of other people’s needs create the foundation for stronger groups and healthier communities.",
       },
       {
-        heading: "Build Sustainable Systems",
+        heading: "Design for Inclusion",
         body:
-          "Health habits are easier to keep when they fit your real calendar, environment, and work demands rather than an idealized routine.",
+          "Social wellbeing improves when systems make participation easier for different kinds of people. Inclusion is not abstraction; it is a design choice in teams, schools, neighborhoods, and organizations.",
         bullets: [
-          "Protect a consistent sleep window during the week",
-          "Schedule movement into the workday instead of hoping it appears",
-          "Use routine screening and primary care visits to catch issues early",
+          "Create feedback channels that people feel safe using",
+          "Make meeting norms and decision rules visible",
+          "Reward collaboration, not only individual output",
         ],
       },
       {
-        heading: "Performance Depends on Recovery",
+        heading: "Healthy Groups Need Repair",
         body:
-          "People who want durable output need recovery systems that are treated as seriously as ambition. Recovery is operational capacity, not a reward after collapse.",
+          "Conflict is inevitable in any real community. Social maturity is the ability to repair harm, re-establish trust, and keep relationships functional after disagreement.",
       },
     ],
     quote:
-      "Preventive health is how long-term performance stays honest.",
+      "Communities become stronger when people practice trust as a daily discipline.",
     authorBio:
-      "Dr. Leah Morgan covers preventive medicine, workforce wellbeing, and the science of sustainable performance.",
+      "Leah Morgan writes about social wellbeing, community resilience, and collaborative culture in modern institutions.",
     relatedSlugs: ["science-literacy-for-everyday-medical-decisions", "ai-automation-skills-future-workplace"],
   },
   {
@@ -623,7 +623,7 @@ export const featuredArticles: StaticArticle[] = [
   {
     slug: "crypto-blockchain-technology",
     category: "finance",
-    area: "Financial Development",
+    area: "Economic / Financial Development",
     level: "Intermediate",
     title: "Blockchain, Digital Assets, and the New Finance Literacy",
     excerpt:
@@ -752,44 +752,44 @@ export const featuredArticles: StaticArticle[] = [
   {
     slug: "science-literacy-for-everyday-medical-decisions",
     category: "science",
-    area: "Health & Sciences",
+    area: "Social Development",
     level: "Intermediate",
-    title: "Science Literacy for Everyday Medical Decisions",
+    title: "Community Literacy for Everyday Social Decisions",
     excerpt:
-      "A practical guide to reading health claims, understanding evidence, and making more informed decisions about treatments and research headlines.",
+      "A practical guide to reading social signals, navigating institutions, and making more informed decisions in communities and networks.",
     readTime: "8 min read",
-    author: "Dr. Samuel Reed",
+    author: "Samuel Reed",
     date: "Mar 16, 2026",
     image:
-      "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFib3JhdG9yeSUyMGhlYWx0aHxlbnwxfHx8fDE3ODAwMjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2NpYWwlMjBjb21tdW5pdHklMjBjb252ZXJzYXRpb258ZW58MXx8fDE3OTA4MjAwMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
     intro:
-      "The modern information environment makes health advice abundant, but not equally reliable. Science literacy helps you distinguish evidence from noise.",
+      "Modern life is full of institutions, norms, and competing narratives. Social literacy helps you interpret signals instead of reacting blindly to them.",
     sections: [
       {
-        heading: "Look at Study Quality",
+        heading: "Read the Social Context",
         body:
-          "Ask whether a claim comes from a peer-reviewed study, a small sample, an observational finding, or a randomized trial. The strength of evidence matters as much as the headline.",
+          "Before responding to a social issue, read the context: who is involved, what incentives are shaping behavior, and which relationships or systems are under pressure.",
       },
       {
-        heading: "Understand Risk and Context",
+        heading: "Interpret Systems, Not Just Emotions",
         body:
-          "Relative improvement can sound dramatic without absolute risk, side effects, or information about who the treatment was actually tested on.",
+          "Personal reactions matter, but social intelligence also requires understanding rules, group dynamics, power structures, and the likely consequences of different responses.",
         bullets: [
-          "Read beyond the summary when a health claim sounds absolute",
-          "Check whether results were replicated by other studies",
-          "Use clinicians and trusted institutions to interpret uncertainty",
+          "Ask what incentives are driving visible behavior",
+          "Notice what is missing from public narratives",
+          "Separate immediate emotion from durable judgment",
         ],
       },
       {
-        heading: "Use Science as a Decision Tool",
+        heading: "Make Better Decisions in Public Life",
         body:
-          "Science literacy is not about memorizing jargon. It is about asking better questions before making medical, lifestyle, or policy decisions.",
+          "Social development is the ability to make decisions that preserve dignity, improve trust, and strengthen the quality of group life over time.",
       },
     ],
     quote:
-      "Better health decisions start with better questions about evidence.",
+      "Better social decisions begin when you learn to read systems as carefully as people.",
     authorBio:
-      "Dr. Samuel Reed writes about public health communication, research interpretation, and science-informed decision-making.",
+      "Samuel Reed writes about civic behavior, institutional trust, and the habits that strengthen community life.",
     relatedSlugs: ["preventive-health-habits-for-modern-work", "education-in-the-age-of-self-directed-learning"],
   },
 ];

@@ -31,7 +31,13 @@ export async function POST(request: Request) {
       select: { id: true, email: true, name: true, interests: true, createdAt: true },
     });
 
-    return ok({ subscription }, { status: 201 });
+    return ok(
+      {
+        message: "Subscription saved successfully.",
+        subscription,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     return handleRouteError(error);
   }

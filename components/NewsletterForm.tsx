@@ -14,22 +14,27 @@ export default function NewsletterForm() {
     setError("");
     setLoading(true);
 
-    const response = await fetch("/api/newsletter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    setLoading(false);
-
-    if (!response.ok) {
       const payload = await response.json().catch(() => null);
-      setError(payload?.error ?? "Unable to subscribe");
-      return;
-    }
+      setLoading(false);
 
-    setEmail("");
-    setMessage("You are subscribed.");
+      if (!response.ok) {
+        setError(payload?.error ?? "Unable to subscribe");
+        return;
+      }
+
+      setEmail("");
+      setMessage(payload?.message ?? "You are subscribed.");
+    } catch {
+      setLoading(false);
+      setError("Unable to subscribe right now. Please try again.");
+    }
   }
 
   return (
@@ -50,6 +55,7 @@ export default function NewsletterForm() {
         {error ? <p className="mt-3 text-left text-sm text-[#ffdfdf]">{error}</p> : null}
       </div>
       <button
+        type="submit"
         disabled={loading}
         className="min-h-20 rounded-[18px] bg-[#dfbb35] px-14 text-2xl font-bold text-[#191919] disabled:opacity-70"
       >

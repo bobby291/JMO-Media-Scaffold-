@@ -52,26 +52,31 @@ export default function JoinPage() {
     const form = new FormData(event.currentTarget);
     const interests = form.getAll("interests").map(String);
 
-    const response = await fetch("/api/newsletter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.get("name"),
-        email: form.get("email"),
-        interests,
-      }),
-    });
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.get("name"),
+          email: form.get("email"),
+          interests,
+        }),
+      });
 
-    setLoading(false);
-
-    if (!response.ok) {
       const body = await response.json().catch(() => null);
-      setError(body?.error ?? "Unable to join the community");
-      return;
-    }
+      setLoading(false);
 
-    event.currentTarget.reset();
-    setMessage("You are in. We saved your community preferences.");
+      if (!response.ok) {
+        setError(body?.error ?? "Unable to join the community");
+        return;
+      }
+
+      event.currentTarget.reset();
+      setMessage(body?.message ?? "You are in. We saved your community preferences.");
+    } catch {
+      setLoading(false);
+      setError("Unable to join the community right now. Please try again.");
+    }
   }
 
   return (

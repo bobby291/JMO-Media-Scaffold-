@@ -10,11 +10,12 @@ import Link from "next/link";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { developmentAreas } from "@/lib/content";
 
 const stats = [
   { value: "500+", label: "Articles Published", tone: "purple" },
   { value: "10K+", label: "Community Members", tone: "gold" },
-  { value: "7", label: "Development Areas", tone: "purple" },
+  { value: String(developmentAreas.length), label: "Development Areas", tone: "purple" },
   { value: "95%", label: "Satisfaction Rate", tone: "gold" },
 ];
 
@@ -68,8 +69,8 @@ const approaches = [
     tone: "purple",
   },
   {
-    title: "Financial Development",
-    description: "Master wealth building, investing, and financial management strategies.",
+    title: "Economic / Financial Development",
+    description: "Master economic literacy, wealth building, investing, and financial management strategies.",
     tone: "gold",
   },
   {
@@ -80,6 +81,16 @@ const approaches = [
   {
     title: "Environmental Sustainability",
     description: "Learn sustainable practices for a better future and stronger communities.",
+    tone: "gold",
+  },
+  {
+    title: "Politics & Governance",
+    description: "Understand public leadership, civic systems, and policy thinking.",
+    tone: "purple",
+  },
+  {
+    title: "Social Development",
+    description: "Strengthen community intelligence, social wellbeing, and healthy participation.",
     tone: "gold",
   },
   {
@@ -111,7 +122,7 @@ export default function AboutPage() {
           </h1>
           <p className="mx-auto mt-7 max-w-4xl text-2xl font-medium leading-10 text-white/90">
             We help people unlock growth across career, mindset, skills,
-            relationships, financial literacy, technology, and impact.
+            relationships, economic literacy, technology, governance, social wellbeing, and impact.
           </p>
         </div>
       </section>
@@ -133,8 +144,8 @@ export default function AboutPage() {
               <p>
                 We curate and create content that addresses the complete
                 spectrum of personal and professional development, from
-                leadership and business acumen to financial literacy,
-                technological skills, sustainability, and meaningful
+                leadership and business acumen to economic literacy,
+                technological skills, sustainability, civic awareness, social development, and meaningful
                 relationships.
               </p>
             </div>
@@ -193,8 +204,8 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[1408px]">
           <div className="text-center">
             <h2 className="text-5xl font-black">Holistic Development Approach</h2>
-            <p className="mx-auto mt-7 max-w-4xl text-2xl leading-9 text-[#707070] dark:text-white/65">
-              We cover seven key development areas to support a complete growth
+              <p className="mx-auto mt-7 max-w-4xl text-2xl leading-9 text-[#707070] dark:text-white/65">
+              We cover nine key development areas to support a complete growth
               journey.
             </p>
           </div>
