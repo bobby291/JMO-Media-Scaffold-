@@ -6,6 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
+import BrandLogo from "@/components/BrandLogo";
+
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/articles", label: "Articles" },
@@ -157,14 +159,7 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
     <header className="bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
       <div className="sticky top-0 z-40 bg-white shadow-[0_1px_10px_rgba(0,0,0,0.08)] dark:bg-[#191919]">
         <nav className="mx-auto flex h-24 max-w-[1408px] items-center justify-between px-6 md:px-9 lg:px-12">
-          <Link href="/" className="flex items-center gap-4" aria-label="JMO Media home">
-            <span className="grid size-14 place-items-center rounded-[14px] bg-[#7427b3] text-xl font-bold text-white shadow-sm">
-              JMO
-            </span>
-            <span className="text-2xl font-semibold tracking-tight md:text-3xl">
-              JMO Media
-            </span>
-          </Link>
+          <BrandLogo size={56} priority />
 
           <div className="hidden items-center gap-10 text-lg font-medium lg:flex">
             {navLinks.map((link) => (

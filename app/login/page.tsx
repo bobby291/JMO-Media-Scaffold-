@@ -5,6 +5,7 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
+import BrandLogo from "@/components/BrandLogo";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function LoginPage() {
@@ -43,12 +44,12 @@ export default function LoginPage() {
         <div className="absolute -bottom-24 -left-24 size-72 rounded-full border border-white/20" />
         <div className="absolute right-16 top-24 size-24 rounded-[28px] border border-white/20 bg-white/10 backdrop-blur animate-jmo-float" />
 
-        <Link href="/" className="relative z-10 flex items-center gap-4">
-          <span className="grid size-14 place-items-center rounded-[16px] bg-white text-xl font-black text-[#7427b3] shadow-lg">
-            JMO
-          </span>
-          <span className="text-2xl font-bold text-white">JMO Media</span>
-        </Link>
+        <BrandLogo
+          size={56}
+          className="relative z-10 flex items-center gap-4 text-white"
+          textClassName="text-2xl font-bold text-white"
+          priority
+        />
 
         <div className="relative z-10 mt-32 max-w-2xl animate-jmo-fade-up">
           <p className="text-sm font-black uppercase tracking-[0.32em] text-[#dfbb35]">

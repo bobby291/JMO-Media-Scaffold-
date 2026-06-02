@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import BrandLogo from "@/components/BrandLogo";
+
 const quickLinks = [
   { href: "/", label: "Home" },
   { href: "/articles", label: "Articles" },
@@ -19,10 +21,10 @@ const socials = [
     icon: "facebook",
     href: "https://www.facebook.com/JESSICAMEDIAOPINIONS?mibextid=rS40aB7S9Ucbxw6v",
   },
-  { label: "X", icon: "x", href: "#" },
-  { label: "LinkedIn", icon: "linkedin", href: "#" },
-  { label: "Instagram", icon: "instagram", href: "#" },
-  { label: "YouTube", icon: "youtube", href: "#" },
+  { label: "X", icon: "x", href: "https://x.com/jmomedia" },
+  { label: "LinkedIn", icon: "linkedin", href: "https://www.linkedin.com/company/jmo-media/" },
+  { label: "Instagram", icon: "instagram", href: "https://www.instagram.com/jmomedia/" },
+  { label: "YouTube", icon: "youtube", href: "https://www.youtube.com/@jmomedia" },
 ];
 
 function SocialIcon({ name }: { name: string }) {
@@ -73,12 +75,10 @@ export default function Footer() {
       <div className="mx-auto max-w-[1408px]">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
           <div>
-            <Link href="/" className="flex items-center gap-4">
-              <span className="grid size-16 place-items-center rounded-[14px] bg-[#7427b3] text-2xl font-bold text-white">
-                JMO
-              </span>
-              <span className="text-3xl font-bold">JMO Media</span>
-            </Link>
+            <BrandLogo
+              size={64}
+              textClassName="text-3xl font-bold"
+            />
             <p className="mt-9 max-w-sm text-xl font-medium leading-9 text-[#a7adb8]">
               Empowering holistic development through valuable, structured
               content.

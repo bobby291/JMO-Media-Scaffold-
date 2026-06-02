@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import BrandLogo from "@/components/BrandLogo";
+
 type PlatformPageProps = {
   eyebrow: string;
   title: string;
@@ -22,12 +24,7 @@ export default function PlatformPage({
       <section className="relative isolate overflow-hidden px-5 py-10 md:px-12 lg:px-24">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(99,75,255,0.28),rgba(219,126,214,0.18)_28%,rgba(255,255,255,0)_58%)]" />
         <nav className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-full bg-slate-950 text-sm font-bold text-white">
-              J
-            </span>
-            <span className="font-semibold">JMO Media</span>
-          </Link>
+          <BrandLogo size={40} textClassName="font-semibold" className="flex items-center gap-3" />
           <div className="flex items-center gap-4 text-sm font-medium">
             <Link href="/login" className="text-slate-600 hover:text-slate-950">
               Sign in
