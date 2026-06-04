@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import doorImage from "@/public/240_F_417681681_h8js9V05pZM4p2FV5UKkn9OTxYfq5fic.jpg";
+import doorImage from "@/public/Door.jpg";
 
 type AuthDoorAccentProps = {
   className?: string;
