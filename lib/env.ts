@@ -1,9 +1,9 @@
 export function hasDatabaseUrl() {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL || process.env.DIRECT_URL);
 }
 
 export function databaseConfigMessage() {
-  return "DATABASE_URL is not configured. Add your Neon connection string to .env.local before using auth, newsletter, or Prisma-backed APIs.";
+  return "DATABASE_URL or DIRECT_URL is not configured. Add your Neon connection string to .env.local before using auth, newsletter, or Prisma-backed APIs.";
 }
 
 export function hasBlobToken() {

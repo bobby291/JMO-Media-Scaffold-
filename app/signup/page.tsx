@@ -1,9 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ArrowLeft, BriefcaseBusiness, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import Link from "next/link";
 
+import AuthDoorAccent from "@/components/AuthDoorAccent";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 const roles = [
@@ -251,9 +252,7 @@ export default function SignupPage() {
       <section className="relative hidden overflow-hidden px-12 py-12 lg:block">
         <div className="absolute inset-0 bg-[#7427b3]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_28%,rgba(223,187,53,0.32),transparent_30%),radial-gradient(circle_at_68%_62%,rgba(255,255,255,0.28),transparent_36%)] animate-jmo-soft-pulse" />
-        <div className="absolute bottom-20 right-16 grid size-24 place-items-center rounded-[28px] border border-white/20 bg-white/10 text-white backdrop-blur animate-jmo-float">
-          <BriefcaseBusiness size={42} />
-        </div>
+        <AuthDoorAccent className="bottom-16 right-16" />
 
         <div className="relative z-10 ml-auto max-w-2xl pt-32 animate-jmo-fade-up">
           <p className="text-sm font-black uppercase tracking-[0.32em] text-[#dfbb35]">

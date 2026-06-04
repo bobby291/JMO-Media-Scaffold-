@@ -1,10 +1,12 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
   Check,
+  CheckCircle2,
   Mail,
   Sparkles,
   TrendingUp,
@@ -39,25 +41,45 @@ const benefits = [
 ];
 
 export default function JoinPage() {
+  const interestTitles = developmentAreas.map((area) => area.title);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [joinedName, setJoinedName] = useState("");
+
+  const allSelected =
+    interestTitles.length > 0 && selectedInterests.length === interestTitles.length;
+
+  function toggleInterest(title: string) {
+    setSelectedInterests((current) =>
+      current.includes(title)
+        ? current.filter((interest) => interest !== title)
+        : [...current, title],
+    );
+  }
+
+  function toggleSelectAll() {
+    setSelectedInterests(allSelected ? [] : interestTitles);
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setMessage("");
     setError("");
     setLoading(true);
 
-    const form = new FormData(event.currentTarget);
-    const interests = form.getAll("interests").map(String);
+    const form = new FormData(formElement);
+    const interests = selectedInterests;
+    const name = String(form.get("name") ?? "").trim();
 
     try {
-      const response = await fetch("/api/newsletter", {
+      const response = await fetch("/api/community/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.get("name"),
+          name,
           email: form.get("email"),
           interests,
         }),
@@ -71,12 +93,46 @@ export default function JoinPage() {
         return;
       }
 
-      event.currentTarget.reset();
-      setMessage(body?.message ?? "You are in. We saved your community preferences.");
+      formElement.reset();
+      setSelectedInterests([]);
+      setJoinedName(name);
+      setMessage(
+        body?.message ??
+          `Thank you for joining our community, ${name}. Check your email for next steps and exclusive content.`,
+      );
     } catch {
       setLoading(false);
       setError("Unable to join the community right now. Please try again.");
     }
+  }
+
+  if (message) {
+    return (
+      <main className="min-h-screen bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
+        <Navbar showHero={false} />
+
+        <section className="flex min-h-[calc(100vh-96px)] items-center justify-center px-6 py-20 md:px-10">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center animate-jmo-fade-up">
+            <span className="grid size-28 place-items-center rounded-full bg-[#f1e8f8] text-[#7427b3]">
+              <CheckCircle2 size={58} />
+            </span>
+            <h1 className="mt-10 text-4xl font-black tracking-tight md:text-6xl">
+              Welcome to JMO Media!
+            </h1>
+            <p className="mt-6 max-w-2xl text-xl leading-9 text-[#707070] dark:text-white/65 md:text-2xl">
+              Thank you for joining our community{joinedName ? `, ${joinedName}` : ""}. Check your
+              email for next steps and exclusive content.
+            </p>
+            <Link
+              href="/"
+              className="mt-10 inline-flex min-h-16 items-center justify-center rounded-2xl bg-[#7427b3] px-10 text-xl font-black text-white shadow-[0_16px_34px_rgba(116,39,179,0.28)] transition hover:-translate-y-0.5 hover:bg-[#5d1f92]"
+            >
+              Back to Home
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -168,8 +224,19 @@ export default function JoinPage() {
               </label>
 
               <fieldset>
-                <legend className="text-xl font-black">
-                  Areas of Interest (select all that apply)
+                <legend className="w-full">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-xl font-black">
+                      Areas of Interest (select all that apply)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={toggleSelectAll}
+                      className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[#7427b3]/18 px-5 text-base font-black text-[#7427b3] transition hover:bg-[#7427b3]/6 dark:border-white/15 dark:text-white dark:hover:bg-white/8"
+                    >
+                      {allSelected ? "Clear all" : "Select all"}
+                    </button>
+                  </div>
                 </legend>
                 <div className="mt-5 grid gap-4">
                   {developmentAreas.map((area) => (
@@ -181,6 +248,8 @@ export default function JoinPage() {
                         type="checkbox"
                         name="interests"
                         value={area.title}
+                        checked={selectedInterests.includes(area.title)}
+                        onChange={() => toggleInterest(area.title)}
                         className="peer sr-only"
                       />
                       <span className="grid size-9 place-items-center rounded-md border-2 border-[#777] bg-white text-transparent transition peer-checked:border-[#7427b3] peer-checked:bg-[#7427b3] peer-checked:text-white dark:bg-[#111]">

@@ -5,6 +5,7 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
+import AuthDoorAccent from "@/components/AuthDoorAccent";
 import BrandLogo from "@/components/BrandLogo";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 
@@ -42,7 +43,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[#7427b3]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_38%_28%,rgba(223,187,53,0.34),transparent_28%),radial-gradient(circle_at_66%_58%,rgba(255,255,255,0.30),transparent_34%)] animate-jmo-soft-pulse" />
         <div className="absolute -bottom-24 -left-24 size-72 rounded-full border border-white/20" />
-        <div className="absolute right-16 top-24 size-24 rounded-[28px] border border-white/20 bg-white/10 backdrop-blur animate-jmo-float" />
+        <AuthDoorAccent className="right-16 top-20" />
 
         <BrandLogo
           size={56}
