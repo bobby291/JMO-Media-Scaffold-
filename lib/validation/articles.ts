@@ -21,7 +21,7 @@ export const mediaAssetSchema = z.object({
 export const articleCreateSchema = z.object({
   title: z.string().trim().min(4).max(160),
   slug: z.string().trim().min(4).max(100).optional(),
-  excerpt: z.string().trim().max(280).optional(),
+  excerpt: z.string().trim().max(500).optional(),
   content: z.string().trim().min(20),
   coverImage: z.string().url().optional(),
   type: z.enum(articleTypes).default("ARTICLE"),

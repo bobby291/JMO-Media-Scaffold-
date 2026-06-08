@@ -17,6 +17,33 @@ const articleTypes = [
   { value: "MEDIA", label: "Media" },
 ];
 
+function getApiErrorMessage(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return "Unable to create article";
+  }
+
+  const error = "error" in payload && typeof payload.error === "string" ? payload.error : "";
+  const details =
+    "details" in payload && payload.details && typeof payload.details === "object"
+      ? payload.details
+      : null;
+  const fieldErrors =
+    details && "fieldErrors" in details && details.fieldErrors && typeof details.fieldErrors === "object"
+      ? details.fieldErrors
+      : null;
+
+  if (fieldErrors) {
+    for (const [field, messages] of Object.entries(fieldErrors)) {
+      if (Array.isArray(messages) && typeof messages[0] === "string") {
+        const label = field.charAt(0).toUpperCase() + field.slice(1);
+        return `${label}: ${messages[0]}`;
+      }
+    }
+  }
+
+  return error || "Unable to create article";
+}
+
 export default function CreateArticleForm({
   categories = [],
 }: {
@@ -54,7 +81,7 @@ export default function CreateArticleForm({
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      setError(payload?.error ?? "Unable to create article");
+      setError(getApiErrorMessage(payload));
       return;
     }
 
@@ -90,8 +117,12 @@ export default function CreateArticleForm({
           Excerpt
           <textarea
             name="excerpt"
+            maxLength={500}
             className="mt-2 min-h-24 w-full resize-none rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
           />
+          <span className="mt-2 block text-xs font-medium text-[#707070] dark:text-white/55">
+            Optional summary, up to 500 characters.
+          </span>
         </label>
 
         <MarkdownEditor
