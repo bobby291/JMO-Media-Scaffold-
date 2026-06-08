@@ -84,7 +84,9 @@ export default function SocialAuthButtons() {
             type="button"
             onClick={async () => {
               setActiveProvider(id);
-              await signIn(id, { callbackUrl: "/dashboard" });
+              await signIn(id, {
+                callbackUrl: `${window.location.origin}/dashboard`,
+              });
             }}
             className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl border border-[#cfd7e6] bg-white px-5 text-lg font-bold text-[#111827] shadow-sm transition hover:-translate-y-0.5 hover:border-[#7427b3]/30 hover:bg-[#faf7ff] dark:border-white/15 dark:bg-[#111] dark:text-white dark:hover:bg-white/5"
           >

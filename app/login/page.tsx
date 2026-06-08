@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { ArrowLeft, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 import AuthDoorAccent from "@/components/AuthDoorAccent";
@@ -10,6 +11,7 @@ import BrandLogo from "@/components/BrandLogo";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,10 +22,11 @@ export default function LoginPage() {
     setLoading(true);
 
     const form = new FormData(event.currentTarget);
+    const dashboardUrl = `${window.location.origin}/dashboard`;
     const result = await signIn("credentials", {
       email: form.get("email"),
       password: form.get("password"),
-      callbackUrl: "/dashboard",
+      callbackUrl: dashboardUrl,
       redirect: false,
     });
 
@@ -34,7 +37,27 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = result?.url ?? "/dashboard";
+    const nextUrl = result?.url;
+
+    if (nextUrl) {
+      try {
+        const resolved = new URL(nextUrl, window.location.origin);
+
+        if (resolved.origin === window.location.origin) {
+          router.replace(`${resolved.pathname}${resolved.search}${resolved.hash}`);
+          router.refresh();
+          return;
+        }
+
+        window.location.assign(resolved.toString());
+        return;
+      } catch {
+        // Fall through to a safe in-app redirect.
+      }
+    }
+
+    router.replace("/dashboard");
+    router.refresh();
   }
 
   return (
