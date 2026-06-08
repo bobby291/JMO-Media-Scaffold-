@@ -4,7 +4,13 @@ import {
   createPasswordResetToken,
   passwordResetIdentifier,
 } from "@/lib/auth/password-reset";
-import { databaseConfigMessage, emailConfigMessage, hasDatabaseUrl, hasEmailProvider } from "@/lib/env";
+import {
+  appBaseUrl,
+  databaseConfigMessage,
+  emailConfigMessage,
+  hasDatabaseUrl,
+  hasEmailProvider,
+} from "@/lib/env";
 import {
   EmailDeliveryError,
   passwordResetEmailContent,
@@ -68,8 +74,14 @@ export async function POST(request: Request) {
         text,
       });
     } catch (error) {
+      const requestOrigin = new URL(request.url).origin;
+
       console.error("Forgot-password email delivery failed", {
         email: user.email,
+        emailFrom: process.env.EMAIL_FROM ?? null,
+        configuredBaseUrl: process.env.NEXTAUTH_URL ?? null,
+        requestOrigin,
+        resolvedBaseUrl: appBaseUrl(request),
         error,
       });
 

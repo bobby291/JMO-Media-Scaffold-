@@ -23,7 +23,11 @@ export function emailConfigMessage() {
 }
 
 export function appBaseUrl(request?: Request) {
-  return process.env.NEXTAUTH_URL ?? (request ? new URL(request.url).origin : "http://localhost:3000");
+  if (request) {
+    return new URL(request.url).origin;
+  }
+
+  return process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 }
 
 export function platformAccessDomains() {
