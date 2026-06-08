@@ -36,7 +36,10 @@ export async function POST(request: Request) {
 
     await prisma.user.update({
       where: { email: payload.email },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        emailVerified: new Date(),
+      },
     });
 
     await prisma.verificationToken.deleteMany({
