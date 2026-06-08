@@ -23,12 +23,26 @@ export default function LoginPage() {
 
     const form = new FormData(event.currentTarget);
     const dashboardUrl = `${window.location.origin}/dashboard`;
-    const result = await signIn("credentials", {
-      email: form.get("email"),
-      password: form.get("password"),
-      callbackUrl: dashboardUrl,
-      redirect: false,
-    });
+    let result;
+
+    try {
+      result = await signIn("credentials", {
+        email: form.get("email"),
+        password: form.get("password"),
+        callbackUrl: dashboardUrl,
+        redirect: false,
+      });
+    } catch (error) {
+      setLoading(false);
+
+      if (error instanceof TypeError && error.message.includes("Invalid URL")) {
+        window.location.assign("/dashboard");
+        return;
+      }
+
+      setError("Unable to complete sign in right now. Please try again.");
+      return;
+    }
 
     setLoading(false);
 
