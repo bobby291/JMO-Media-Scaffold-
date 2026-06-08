@@ -3,6 +3,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
+import MarkdownEditor from "@/components/MarkdownEditor";
+
 type CategoryOption = {
   id: string;
   name: string;
@@ -24,6 +26,7 @@ export default function CreateArticleForm({
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [content, setContent] = React.useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -57,6 +60,7 @@ export default function CreateArticleForm({
 
     setSuccess("Article saved successfully.");
     event.currentTarget.reset();
+    setContent("");
     router.refresh();
   }
 
@@ -90,15 +94,15 @@ export default function CreateArticleForm({
           />
         </label>
 
-        <label className="block font-semibold">
-          Content
-          <textarea
-            name="content"
-            required
-            minLength={20}
-            className="mt-2 min-h-48 w-full resize-none rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
-          />
-        </label>
+        <MarkdownEditor
+          label="Content"
+          name="content"
+          value={content}
+          onChange={setContent}
+          required
+          minLength={20}
+          placeholder="Write the article body here. Use the toolbar to format headings, lists, quotes, and links."
+        />
 
         <label className="block font-semibold">
           Cover image URL

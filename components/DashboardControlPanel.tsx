@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 import CreateArticleForm from "@/components/CreateArticleForm";
+import MarkdownEditor from "@/components/MarkdownEditor";
 
 type DashboardCategory = {
   id: string;
@@ -1937,21 +1938,39 @@ export default function DashboardControlPanel({
                 Excerpt
                 <textarea
                   name="excerpt"
-                  defaultValue={activeArticle.excerpt ?? ""}
+                  value={activeArticle.excerpt ?? ""}
+                  onChange={(event) =>
+                    setActiveArticle((current) =>
+                      current
+                        ? {
+                            ...current,
+                            excerpt: event.target.value,
+                          }
+                        : current,
+                    )
+                  }
                   className="mt-2 min-h-24 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
                 />
               </label>
 
-              <label className="block font-semibold">
-                Content
-                <textarea
-                  name="content"
-                  required
-                  minLength={20}
-                  defaultValue={activeArticle.content}
-                  className="mt-2 min-h-56 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
-                />
-              </label>
+              <MarkdownEditor
+                label="Content"
+                name="content"
+                value={activeArticle.content}
+                onChange={(value) =>
+                  setActiveArticle((current) =>
+                    current
+                      ? {
+                          ...current,
+                          content: value,
+                        }
+                      : current,
+                  )
+                }
+                required
+                minLength={20}
+                placeholder="Use the toolbar to format article content."
+              />
 
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block font-semibold">

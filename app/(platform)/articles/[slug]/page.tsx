@@ -9,6 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import CommentForm from "@/components/CommentForm";
+import MarkdownContent from "@/components/MarkdownContent";
 import Navbar from "@/components/Navbar";
 import { featuredArticles, type StaticArticle } from "@/lib/content";
 import {
@@ -111,7 +112,6 @@ export default async function ArticleDetailPage({
   const readTime = article ? estimateReadTime(article.content) : fallback?.readTime;
   const category = article?.category?.name ?? fallback?.area ?? "Article";
   const level = fallback?.level ?? "Published";
-  const bodyParagraphs = content.split("\n").filter(Boolean);
   const relatedArticles = fallback?.relatedSlugs.length
     ? fallback.relatedSlugs
         .map((relatedSlug) =>
@@ -219,11 +219,7 @@ export default async function ArticleDetailPage({
               ))}
             </div>
           ) : (
-            <div className="space-y-6 text-xl leading-9 text-[#4f4f4f] dark:text-white/75">
-              {bodyParagraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
+            <MarkdownContent content={content} />
           )}
         </section>
       </article>
