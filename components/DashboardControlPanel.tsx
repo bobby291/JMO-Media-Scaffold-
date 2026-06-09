@@ -149,6 +149,15 @@ type EditableManagedUser = Pick<
   "id" | "name" | "bio" | "image" | "role" | "emailVerified" | "email"
 >;
 
+type DashboardSection =
+  | "profile"
+  | "publishing"
+  | "create"
+  | "categories"
+  | "users"
+  | "media"
+  | "comments";
+
 const statusOptions: ArticleStatus[] = ["DRAFT", "REVIEW", "PUBLISHED", "ARCHIVED"];
 const typeOptions: ArticleType[] = ["ARTICLE", "NEWS", "EDITORIAL", "MEDIA"];
 const mediaTypeOptions: MediaType[] = ["IMAGE", "VIDEO", "AUDIO", "DOCUMENT", "EMBED"];
@@ -285,6 +294,72 @@ export default function DashboardControlPanel({
 
   const canEdit = user.role === "EDITOR" || user.role === "ADMIN";
   const isAdmin = user.role === "ADMIN";
+  const [requestedSection, setRequestedSection] =
+    React.useState<DashboardSection>("profile");
+
+  const sectionTabs = React.useMemo(
+    () =>
+      [
+        {
+          id: "profile" as const,
+          label: "Profile panel",
+          description: "Account details and user settings",
+          visible: true,
+          icon: UserRound,
+        },
+        {
+          id: "publishing" as const,
+          label: "Publishing controls",
+          description: "Article workflow and review actions",
+          visible: canEdit,
+          icon: Shield,
+        },
+        {
+          id: "create" as const,
+          label: "Create content",
+          description: "Compose and save new posts",
+          visible: canEdit,
+          icon: PencilLine,
+        },
+        {
+          id: "categories" as const,
+          label: "Category manager",
+          description: "Maintain the content taxonomy",
+          visible: isAdmin,
+          icon: LayoutGrid,
+        },
+        {
+          id: "users" as const,
+          label: "User management",
+          description: "Roles, verification, and account actions",
+          visible: isAdmin,
+          icon: Users,
+        },
+        {
+          id: "media" as const,
+          label: "Media asset manager",
+          description: "Shared asset library and uploads",
+          visible: canEdit,
+          icon: Film,
+        },
+        {
+          id: "comments" as const,
+          label: "Comment moderation",
+          description: "Approve, hold, or delete community comments",
+          visible: isAdmin,
+          icon: MessageSquareMore,
+        },
+      ].filter((tab) => tab.visible),
+    [canEdit, isAdmin],
+  );
+
+  const activeSection = React.useMemo(
+    () =>
+      sectionTabs.some((tab) => tab.id === requestedSection)
+        ? requestedSection
+        : (sectionTabs[0]?.id ?? "profile"),
+    [requestedSection, sectionTabs],
+  );
 
   const stats = React.useMemo(
     () => ({
@@ -884,9 +959,139 @@ export default function DashboardControlPanel({
 
   return (
     <section className="mx-auto max-w-[1408px] px-6 py-16 md:px-10">
-      <div className="grid gap-8 xl:grid-cols-[0.84fr_1.16fr]">
+      {isAdmin ? (
+        <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="text-[#7427b3]" />
+            <h2 className="text-2xl font-black">Analytics and reporting</h2>
+          </div>
+          <p className="mt-3 text-[#707070] dark:text-white/65">
+            Operational totals across users, content workflow, and moderation volume.
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl bg-[#f8f4fc] p-5">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#7427b3]">
+                Users
+              </p>
+              <p className="mt-3 text-3xl font-black">{analytics.totalUsers}</p>
+            </div>
+            <div className="rounded-2xl bg-emerald-50 p-5">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-700">
+                Published
+              </p>
+              <p className="mt-3 text-3xl font-black">{analytics.publishedArticles}</p>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-5">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">
+                Pending comments
+              </p>
+              <p className="mt-3 text-3xl font-black">{analytics.pendingComments}</p>
+            </div>
+            <div className="rounded-2xl bg-sky-50 p-5">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-700">
+                Media assets
+              </p>
+              <p className="mt-3 text-3xl font-black">{analytics.totalMediaAssets}</p>
+            </div>
+            <div className="rounded-2xl bg-[#fbf6e7] p-5 md:col-span-2 xl:col-span-1">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#b98f07]">
+                Categories
+              </p>
+              <p className="mt-3 text-3xl font-black">{analytics.totalCategories}</p>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-[#ececec] p-5 dark:border-white/10">
+              <h3 className="text-lg font-black">Users by role</h3>
+              <div className="mt-4 space-y-3">
+                {analytics.userRoleStats.map((item) => (
+                  <div key={item.role} className="flex items-center justify-between text-sm">
+                    <span className="font-semibold">{item.role}</span>
+                    <span className="font-black text-[#7427b3]">{item.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-[#ececec] p-5 dark:border-white/10">
+              <h3 className="text-lg font-black">Content workflow mix</h3>
+              <div className="mt-4 space-y-3">
+                {analytics.articleStats.map((item) => (
+                  <div
+                    key={`${item.type}-${item.status}`}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="font-semibold">
+                      {item.type} / {item.status}
+                    </span>
+                    <span className="font-black text-[#7427b3]">{item.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-8 rounded-[24px] border border-[#e4e4e4] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#222]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7427b3]">
+              Workspace navigation
+            </p>
+            <h2 className="mt-2 text-2xl font-black">Dashboard sections</h2>
+            <p className="mt-2 text-sm text-[#707070] dark:text-white/60">
+              Use the tabs to move between profile, publishing, creation, categories, users, media, and moderation.
+            </p>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-1">
+            {sectionTabs.map((tab) => {
+              const Icon = tab.icon;
+              const active = activeSection === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setRequestedSection(tab.id)}
+                  className={`min-w-fit rounded-2xl border px-4 py-3 text-left transition ${
+                    active
+                      ? "border-[#7427b3] bg-[#7427b3] text-white shadow-sm"
+                      : "border-[#e6ddf1] bg-[#faf7fd] text-[#7427b3]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon size={16} />
+                    <span className="text-sm font-black">{tab.label}</span>
+                  </div>
+                  <p className={`mt-1 text-xs ${active ? "text-white/80" : "text-[#6e57a8]"}`}>
+                    {tab.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {actionError ? (
+        <p className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {actionError}
+        </p>
+      ) : null}
+      {actionNotice ? (
+        <p className="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+          {actionNotice}
+        </p>
+      ) : null}
+
+      <div className="mt-8 grid gap-8">
         <div className="space-y-8">
-          <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
+          {activeSection === "profile" ? (
+            <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-[#7427b3]">
@@ -1043,11 +1248,14 @@ export default function DashboardControlPanel({
                 {busyKey === "profile:update" ? "Saving..." : "Save profile"}
               </button>
             </form>
-          </div>
+            </div>
+          ) : null}
 
-          {canEdit ? <CreateArticleForm categories={categoryItems} /> : null}
+          {activeSection === "create" && canEdit ? (
+            <CreateArticleForm categories={categoryItems} />
+          ) : null}
 
-          {isAdmin ? (
+          {activeSection === "categories" && isAdmin ? (
             <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
               <div className="flex items-center gap-3">
                 <LayoutGrid className="text-[#7427b3]" />
@@ -1114,7 +1322,8 @@ export default function DashboardControlPanel({
         </div>
 
         <div className="space-y-8">
-          <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
+          {activeSection === "publishing" ? (
+            <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-[#7427b3]">
@@ -1175,17 +1384,6 @@ export default function DashboardControlPanel({
                 ))}
               </select>
             </div>
-
-            {actionError ? (
-              <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                {actionError}
-              </p>
-            ) : null}
-            {actionNotice ? (
-              <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-                {actionNotice}
-              </p>
-            ) : null}
 
             <div className="mt-8 space-y-4">
               {canEdit ? (
@@ -1322,9 +1520,10 @@ export default function DashboardControlPanel({
                 </div>
               ) : null}
             </div>
-          </div>
+            </div>
+          ) : null}
 
-          {isAdmin ? (
+          {activeSection === "users" && isAdmin ? (
             <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
               <div className="flex items-center gap-3">
                 <Users className="text-[#7427b3]" />
@@ -1444,7 +1643,7 @@ export default function DashboardControlPanel({
             </div>
           ) : null}
 
-          {canEdit ? (
+          {activeSection === "media" && canEdit ? (
             <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
               <div className="flex items-center gap-3">
                 <Film className="text-[#7427b3]" />
@@ -1730,7 +1929,7 @@ export default function DashboardControlPanel({
             </div>
           ) : null}
 
-          {isAdmin ? (
+          {activeSection === "comments" && isAdmin ? (
             <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
               <div className="flex items-center gap-3">
                 <MessageSquareMore className="text-[#7427b3]" />
@@ -1835,81 +2034,6 @@ export default function DashboardControlPanel({
             </div>
           ) : null}
 
-          {isAdmin ? (
-            <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
-              <div className="flex items-center gap-3">
-                <BarChart3 className="text-[#7427b3]" />
-                <h2 className="text-2xl font-black">Analytics and reporting</h2>
-              </div>
-              <p className="mt-3 text-[#707070] dark:text-white/65">
-                Operational totals across users, content workflow, and moderation volume.
-              </p>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-2xl bg-[#f8f4fc] p-5">
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#7427b3]">
-                    Users
-                  </p>
-                  <p className="mt-3 text-3xl font-black">{analytics.totalUsers}</p>
-                </div>
-                <div className="rounded-2xl bg-emerald-50 p-5">
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-700">
-                    Published
-                  </p>
-                  <p className="mt-3 text-3xl font-black">{analytics.publishedArticles}</p>
-                </div>
-                <div className="rounded-2xl bg-amber-50 p-5">
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">
-                    Pending comments
-                  </p>
-                  <p className="mt-3 text-3xl font-black">{analytics.pendingComments}</p>
-                </div>
-                <div className="rounded-2xl bg-sky-50 p-5">
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-sky-700">
-                    Media assets
-                  </p>
-                  <p className="mt-3 text-3xl font-black">{analytics.totalMediaAssets}</p>
-                </div>
-                <div className="rounded-2xl bg-[#fbf6e7] p-5 md:col-span-2 xl:col-span-1">
-                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#b98f07]">
-                    Categories
-                  </p>
-                  <p className="mt-3 text-3xl font-black">{analytics.totalCategories}</p>
-                </div>
-              </div>
-
-              <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                <div className="rounded-2xl border border-[#ececec] p-5 dark:border-white/10">
-                  <h3 className="text-lg font-black">Users by role</h3>
-                  <div className="mt-4 space-y-3">
-                    {analytics.userRoleStats.map((item) => (
-                      <div key={item.role} className="flex items-center justify-between text-sm">
-                        <span className="font-semibold">{item.role}</span>
-                        <span className="font-black text-[#7427b3]">{item.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-[#ececec] p-5 dark:border-white/10">
-                  <h3 className="text-lg font-black">Content workflow mix</h3>
-                  <div className="mt-4 space-y-3">
-                    {analytics.articleStats.map((item) => (
-                      <div
-                        key={`${item.type}-${item.status}`}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="font-semibold">
-                          {item.type} / {item.status}
-                        </span>
-                        <span className="font-black text-[#7427b3]">{item.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
 
