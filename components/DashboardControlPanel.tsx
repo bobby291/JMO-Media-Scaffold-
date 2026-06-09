@@ -249,6 +249,7 @@ export default function DashboardControlPanel({
     success: "",
     loading: false,
   });
+  const [categoryItems, setCategoryItems] = React.useState(categories);
   const [users, setUsers] = React.useState(managedUsers);
   const [comments, setComments] = React.useState(moderationComments);
   const [media, setMedia] = React.useState(mediaAssets);
@@ -482,12 +483,20 @@ export default function DashboardControlPanel({
 
     setCategoryName("");
     setCategoryDescription("");
+    setCategoryItems((current) =>
+      [...current, {
+        id: payload.category.id,
+        name: payload.category.name,
+        slug: payload.category.slug,
+        description: payload.category.description,
+        articleCount: 0,
+      }].sort((left, right) => left.name.localeCompare(right.name)),
+    );
     setCategoryState({
       error: "",
       success: `Created ${payload.category.name}.`,
       loading: false,
     });
-    router.refresh();
   }
 
   async function handleUserRoleChange(userId: string, role: UserRole) {
@@ -1036,7 +1045,7 @@ export default function DashboardControlPanel({
             </form>
           </div>
 
-          {canEdit ? <CreateArticleForm categories={categories} /> : null}
+          {canEdit ? <CreateArticleForm categories={categoryItems} /> : null}
 
           {isAdmin ? (
             <div className="rounded-[24px] border border-[#e4e4e4] bg-white p-7 shadow-sm dark:border-white/10 dark:bg-[#222]">
@@ -1083,7 +1092,7 @@ export default function DashboardControlPanel({
               </form>
 
               <div className="mt-8 space-y-3">
-                {categories.map((category) => (
+                {categoryItems.map((category) => (
                   <div
                     key={category.id}
                     className="flex items-center justify-between rounded-xl border border-[#ececec] px-4 py-3 dark:border-white/10"
@@ -1991,7 +2000,7 @@ export default function DashboardControlPanel({
                     className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
                   >
                     <option value="">Uncategorized</option>
-                    {categories.map((category) => (
+                    {categoryItems.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>

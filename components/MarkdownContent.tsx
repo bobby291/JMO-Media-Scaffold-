@@ -87,7 +87,7 @@ type Block =
   | { type: "blockquote"; text: string }
   | { type: "ul"; items: string[] }
   | { type: "ol"; items: string[] }
-  | { type: "alignment"; align: "left" | "center" | "right"; content: string }
+  | { type: "alignment"; align: "left" | "center" | "right" | "justify"; content: string }
   | { type: "paragraph"; text: string };
 
 function parseBlocks(markdown: string): Block[] {
@@ -115,7 +115,7 @@ function parseBlocks(markdown: string): Block[] {
       continue;
     }
 
-    const alignment = trimmed.match(/^:::\s+align-(left|center|right)$/);
+    const alignment = trimmed.match(/^:::\s+align-(left|center|right|justify)$/);
     if (alignment) {
       index += 1;
       const contentLines: string[] = [];
@@ -128,7 +128,7 @@ function parseBlocks(markdown: string): Block[] {
       }
       blocks.push({
         type: "alignment",
-        align: alignment[1] as "left" | "center" | "right",
+        align: alignment[1] as "left" | "center" | "right" | "justify",
         content: contentLines.join("\n").trim(),
       });
       continue;
@@ -245,6 +245,8 @@ function renderBlock(block: Block, index: number): React.ReactNode {
         ? "text-center"
         : block.align === "right"
           ? "text-right"
+          : block.align === "justify"
+            ? "text-justify"
           : "text-left";
 
     return (

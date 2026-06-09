@@ -2,6 +2,7 @@
 
 import {
   AlignCenter,
+  AlignJustify,
   AlignLeft,
   AlignRight,
   Bold,
@@ -139,6 +140,16 @@ const actions: EditorAction[] = [
     apply: (selected) => ({
       text: `::: align-right\n${selected || "Right aligned text"}\n:::`,
       startOffset: 15,
+      endOffset: 4,
+    }),
+  },
+  {
+    label: "Justify",
+    title: "Justify",
+    icon: <AlignJustify size={16} />,
+    apply: (selected) => ({
+      text: `::: align-justify\n${selected || "Justified text"}\n:::`,
+      startOffset: 17,
       endOffset: 4,
     }),
   },

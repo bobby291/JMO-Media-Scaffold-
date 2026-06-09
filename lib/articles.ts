@@ -62,7 +62,7 @@ function categoryBadgeLabel(article: DbArticle) {
       return "professional-business";
     case "technological-development":
       return "technology";
-    case "economic-financial-development":
+    case "financial-development":
       return "economic-financial";
     case "educational-development":
       return "educational";
@@ -70,7 +70,7 @@ function categoryBadgeLabel(article: DbArticle) {
       return "environmental";
     case "politics-governance":
       return "politics-governance";
-    case "social-development":
+    case "health-sciences":
       return "social-development";
     case "relationship-development":
       return "relationship";
