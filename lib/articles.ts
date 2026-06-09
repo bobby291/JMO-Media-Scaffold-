@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 
-import { featuredArticles } from "@/lib/content";
+import { featuredArticles, type StaticArticle } from "@/lib/content";
 import { prisma } from "@/lib/db/prisma";
 import { hasDatabaseUrl } from "@/lib/env";
 
@@ -34,6 +34,27 @@ export type ArticlePreview = {
   date: string;
   image: string;
 };
+
+export function staticArticleToMarkdown(article: StaticArticle) {
+  const blocks: string[] = [`# ${article.title}`, "", article.intro];
+
+  article.sections.forEach((section, index) => {
+    blocks.push("", `## ${section.heading}`, "", section.body);
+
+    if (index === 0 && article.quote) {
+      blocks.push("", `> ${article.quote}`);
+    }
+
+    if (section.bullets?.length) {
+      blocks.push(
+        "",
+        ...section.bullets.map((bullet) => `- ${bullet}`),
+      );
+    }
+  });
+
+  return blocks.join("\n");
+}
 
 export function estimateReadTime(content: string) {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
@@ -83,6 +104,7 @@ export function toArticlePreview(article: DbArticle): ArticlePreview {
   return {
     slug: article.slug,
     category: categoryBadgeLabel(article),
+    area: article.category?.name ?? article.type,
     title: article.title,
     excerpt: article.excerpt ?? article.content.slice(0, 150),
     readTime: estimateReadTime(article.content),
@@ -93,6 +115,86 @@ export function toArticlePreview(article: DbArticle): ArticlePreview {
       article.media.find((asset) => asset.type === "IMAGE")?.url ??
       featuredArticles[0].image,
   };
+}
+
+export function mergeArticlePreviews(
+  primary: ArticlePreview[],
+  secondary: ArticlePreview[],
+) {
+  const seen = new Set<string>();
+
+  return [...primary, ...secondary].filter((article) => {
+    const key = article.slug.toLowerCase();
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
+export async function syncStaticArticles(authorId: string) {
+  if (!hasDatabaseUrl()) {
+    return;
+  }
+
+  const categories = await prisma.category.findMany({
+    select: { id: true, name: true },
+  });
+
+  const categoryIdByName = new Map(categories.map((category) => [category.name, category.id]));
+  const existing = await prisma.article.findMany({
+    select: { slug: true },
+    where: { slug: { in: featuredArticles.map((article) => article.slug) } },
+  });
+  const existingSlugs = new Set(existing.map((article) => article.slug));
+
+  const missingArticles = featuredArticles
+    .filter((article) => !existingSlugs.has(article.slug))
+    .map((article) => ({
+      title: article.title,
+      slug: article.slug,
+      excerpt: article.excerpt,
+      content: staticArticleToMarkdown(article),
+      coverImage: article.image,
+      type: "ARTICLE" as const,
+      status: "PUBLISHED" as const,
+      publishedAt: new Date(article.date),
+      authorId,
+      categoryId: categoryIdByName.get(article.area) ?? null,
+    }));
+
+  if (!missingArticles.length) {
+    return;
+  }
+
+  await prisma.article.createMany({
+    data: missingArticles,
+    skipDuplicates: true,
+  });
+}
+
+export async function getUnifiedPublishedArticlePreviews(limit = 50) {
+  const dbArticles = await getPublishedArticles(limit);
+  const dbPreviews = dbArticles.map(toArticlePreview);
+
+  return mergeArticlePreviews(
+    dbPreviews,
+    featuredArticles.map((article) => ({
+      slug: article.slug,
+      category: article.category,
+      area: article.area,
+      level: article.level,
+      title: article.title,
+      excerpt: article.excerpt,
+      readTime: article.readTime,
+      author: article.author,
+      date: article.date,
+      image: article.image,
+    })),
+  );
 }
 
 export async function getPublishedArticles(limit = 20) {

@@ -3,8 +3,9 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import DashboardControlPanel from "@/components/DashboardControlPanel";
 import Navbar from "@/components/Navbar";
+import { syncStaticArticles } from "@/lib/articles";
 import { prisma } from "@/lib/db/prisma";
-import { developmentAreas, featuredArticles } from "@/lib/content";
+import { developmentAreas } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -52,10 +53,6 @@ export default async function DashboardPage() {
   const role = session.user.role;
   const canManageContent = role === "EDITOR" || role === "ADMIN";
   const isAdmin = role === "ADMIN";
-  const staticCategoryCounts = featuredArticles.reduce<Record<string, number>>((accumulator, article) => {
-    accumulator[article.area] = (accumulator[article.area] ?? 0) + 1;
-    return accumulator;
-  }, {});
 
   await prisma.category.createMany({
     data: developmentAreas.map((area) => ({
@@ -65,6 +62,10 @@ export default async function DashboardPage() {
     })),
     skipDuplicates: true,
   });
+
+  if (canManageContent) {
+    await syncStaticArticles(session.user.id);
+  }
 
   const [user, articles, categories, managedUsers, comments, articleStats, userStats, mediaAssets] =
     await Promise.all([
@@ -111,7 +112,6 @@ export default async function DashboardPage() {
               },
             },
           },
-          take: 50,
         })
       : Promise.resolve([]),
     prisma.category.findMany({
@@ -285,7 +285,7 @@ export default async function DashboardPage() {
           name: category.name,
           slug: category.slug,
           description: category.description,
-          articleCount: category._count.articles + (staticCategoryCounts[category.name] ?? 0),
+          articleCount: category._count.articles,
         }))}
         managedUsers={managedUsers.map((managedUser) => ({
           id: managedUser.id,

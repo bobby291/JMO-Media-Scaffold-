@@ -16,9 +16,15 @@ import {
   estimateReadTime,
   formatArticleDate,
   getArticleBySlug,
+  getUnifiedPublishedArticlePreviews,
 } from "@/lib/articles";
 
-function RelatedArticleCard({ article }: { article: StaticArticle }) {
+type RelatedArticle = Pick<
+  StaticArticle,
+  "slug" | "title" | "excerpt" | "image" | "author" | "date" | "readTime" | "category"
+>;
+
+function RelatedArticleCard({ article }: { article: RelatedArticle }) {
   return (
     <Link
       href={`/articles/${article.slug}`}
@@ -97,6 +103,7 @@ export default async function ArticleDetailPage({
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
   const fallback = featuredArticles.find((item) => item.slug === slug);
+  const unifiedPublishedArticles = await getUnifiedPublishedArticlePreviews(100);
 
   if (!article && !fallback) {
     notFound();
@@ -112,15 +119,18 @@ export default async function ArticleDetailPage({
   const readTime = article ? estimateReadTime(article.content) : fallback?.readTime;
   const category = article?.category?.name ?? fallback?.area ?? "Article";
   const level = fallback?.level ?? "Published";
-  const relatedArticles = fallback?.relatedSlugs.length
-    ? fallback.relatedSlugs
-        .map((relatedSlug) =>
-          featuredArticles.find((item) => item.slug === relatedSlug),
-        )
-        .filter(Boolean)
-    : featuredArticles
-        .filter((item) => item.slug !== slug && item.category === fallback?.category)
-        .slice(0, 2);
+  const currentPreview = unifiedPublishedArticles.find((item) => item.slug === slug);
+  const matchedRelatedArticles = unifiedPublishedArticles.filter(
+    (item) =>
+      item.slug !== slug &&
+      (item.area === currentPreview?.area ||
+        item.category === currentPreview?.category),
+  );
+  const relatedArticles = (
+    matchedRelatedArticles.length
+      ? matchedRelatedArticles
+      : unifiedPublishedArticles.filter((item) => item.slug !== slug)
+  ).slice(0, 3);
 
   return (
     <main className="min-h-screen bg-white text-[#191919] dark:bg-[#191919] dark:text-white">

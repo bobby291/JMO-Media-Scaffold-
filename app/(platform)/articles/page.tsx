@@ -1,24 +1,12 @@
 import ArticlesContentBrowser from "@/components/ArticlesContentBrowser";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { featuredArticles } from "@/lib/content";
-import { getPublishedArticles, toArticlePreview } from "@/lib/articles";
+import { getUnifiedPublishedArticlePreviews } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
 export default async function ArticlesPage() {
-  const dbArticles = await getPublishedArticles(50);
-  const dbPreviews = dbArticles.map(toArticlePreview);
-  const articles = [
-    ...featuredArticles,
-    ...dbPreviews.filter(
-      (article) =>
-        !featuredArticles.some(
-          (featured) =>
-            featured.slug === article.slug || featured.title === article.title,
-        ),
-    ),
-  ];
+  const articles = await getUnifiedPublishedArticlePreviews(50);
 
   return (
     <main className="min-h-screen bg-white text-[#191919] dark:bg-[#191919] dark:text-white">
