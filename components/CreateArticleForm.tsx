@@ -50,6 +50,7 @@ export default function CreateArticleForm({
   categories?: CategoryOption[];
 }) {
   const router = useRouter();
+  const defaultCategoryId = categories[0]?.id ?? "";
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -149,7 +150,7 @@ export default function CreateArticleForm({
             Category
             <select
               name="categoryId"
-              defaultValue=""
+              defaultValue={defaultCategoryId}
               className="mt-2 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
             >
               <option value="">Uncategorized</option>

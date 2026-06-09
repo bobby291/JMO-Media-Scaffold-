@@ -244,7 +244,7 @@ export default function Navbar({ showHero = true }: { showHero?: boolean }) {
 
             <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
               <Link
-                href="#featured-content"
+                href="/articles"
                 className="inline-flex items-center justify-center gap-4 rounded-[14px] bg-white px-9 py-5 text-lg font-semibold text-[#7427b3] transition hover:bg-white/90"
               >
                 Explore Articles

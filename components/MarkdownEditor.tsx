@@ -1,6 +1,9 @@
 "use client";
 
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   Heading1,
   Heading2,
@@ -109,6 +112,36 @@ const actions: EditorAction[] = [
       endOffset: selected ? 21 : -21,
     }),
   },
+  {
+    label: "Align left",
+    title: "Align left",
+    icon: <AlignLeft size={16} />,
+    apply: (selected) => ({
+      text: `::: align-left\n${selected || "Left aligned text"}\n:::`,
+      startOffset: 14,
+      endOffset: 4,
+    }),
+  },
+  {
+    label: "Align center",
+    title: "Align center",
+    icon: <AlignCenter size={16} />,
+    apply: (selected) => ({
+      text: `::: align-center\n${selected || "Centered text"}\n:::`,
+      startOffset: 16,
+      endOffset: 4,
+    }),
+  },
+  {
+    label: "Align right",
+    title: "Align right",
+    icon: <AlignRight size={16} />,
+    apply: (selected) => ({
+      text: `::: align-right\n${selected || "Right aligned text"}\n:::`,
+      startOffset: 15,
+      endOffset: 4,
+    }),
+  },
 ];
 
 export default function MarkdownEditor({
@@ -184,7 +217,7 @@ export default function MarkdownEditor({
         />
       </div>
       <p className="mt-2 text-sm font-medium text-[#707070] dark:text-white/55">
-        Use the toolbar for headings, bold, italics, lists, quotes, and links.
+        Use the toolbar for headings, bold, italics, lists, quotes, links, and text alignment.
       </p>
     </label>
   );

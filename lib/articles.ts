@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 
 import { featuredArticles } from "@/lib/content";
 import { prisma } from "@/lib/db/prisma";
+import { hasDatabaseUrl } from "@/lib/env";
 
 const articleInclude = {
   author: { select: { id: true, name: true, image: true, role: true, bio: true } },
@@ -51,10 +52,37 @@ export function formatArticleDate(date: Date | string | null | undefined) {
   }).format(new Date(date));
 }
 
+function categoryBadgeLabel(article: DbArticle) {
+  const slug = article.category?.slug ?? "";
+
+  switch (slug) {
+    case "leadership-development":
+      return "leadership";
+    case "professional-business-development":
+      return "professional-business";
+    case "technological-development":
+      return "technology";
+    case "economic-financial-development":
+      return "economic-financial";
+    case "educational-development":
+      return "educational";
+    case "environmental-sustainability":
+      return "environmental";
+    case "politics-governance":
+      return "politics-governance";
+    case "social-development":
+      return "social-development";
+    case "relationship-development":
+      return "relationship";
+    default:
+      return article.category?.slug ?? article.type.toLowerCase();
+  }
+}
+
 export function toArticlePreview(article: DbArticle): ArticlePreview {
   return {
     slug: article.slug,
-    category: article.category?.slug ?? article.type.toLowerCase(),
+    category: categoryBadgeLabel(article),
     title: article.title,
     excerpt: article.excerpt ?? article.content.slice(0, 150),
     readTime: estimateReadTime(article.content),
@@ -68,7 +96,7 @@ export function toArticlePreview(article: DbArticle): ArticlePreview {
 }
 
 export async function getPublishedArticles(limit = 20) {
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return [];
   }
 
@@ -88,7 +116,7 @@ export async function getPublishedArticles(limit = 20) {
 }
 
 export async function getArticleBySlug(slug: string) {
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return null;
   }
 

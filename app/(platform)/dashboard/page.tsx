@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import DashboardControlPanel from "@/components/DashboardControlPanel";
 import Navbar from "@/components/Navbar";
 import { prisma } from "@/lib/db/prisma";
+import { developmentAreas } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,15 @@ export default async function DashboardPage() {
   const role = session.user.role;
   const canManageContent = role === "EDITOR" || role === "ADMIN";
   const isAdmin = role === "ADMIN";
+
+  await prisma.category.createMany({
+    data: developmentAreas.map((area) => ({
+      name: area.title,
+      slug: area.slug,
+      description: area.description,
+    })),
+    skipDuplicates: true,
+  });
 
   const [user, articles, categories, managedUsers, comments, articleStats, userStats, mediaAssets] =
     await Promise.all([

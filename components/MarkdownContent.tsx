@@ -87,6 +87,7 @@ type Block =
   | { type: "blockquote"; text: string }
   | { type: "ul"; items: string[] }
   | { type: "ol"; items: string[] }
+  | { type: "alignment"; align: "left" | "center" | "right"; content: string }
   | { type: "paragraph"; text: string };
 
 function parseBlocks(markdown: string): Block[] {
@@ -111,6 +112,25 @@ function parseBlocks(markdown: string): Block[] {
         text: heading[2],
       });
       index += 1;
+      continue;
+    }
+
+    const alignment = trimmed.match(/^:::\s+align-(left|center|right)$/);
+    if (alignment) {
+      index += 1;
+      const contentLines: string[] = [];
+      while (index < lines.length && lines[index].trim() !== ":::") {
+        contentLines.push(lines[index]);
+        index += 1;
+      }
+      if (index < lines.length && lines[index].trim() === ":::") {
+        index += 1;
+      }
+      blocks.push({
+        type: "alignment",
+        align: alignment[1] as "left" | "center" | "right",
+        content: contentLines.join("\n").trim(),
+      });
       continue;
     }
 
@@ -162,6 +182,85 @@ function parseBlocks(markdown: string): Block[] {
   return blocks;
 }
 
+function renderBlock(block: Block, index: number): React.ReactNode {
+  if (block.type === "heading") {
+    const headingClass =
+      block.level === 1
+        ? "text-4xl font-black leading-tight text-[#191919] dark:text-white"
+        : block.level === 2
+          ? "text-3xl font-bold text-[#191919] dark:text-white"
+          : "text-2xl font-bold text-[#191919] dark:text-white";
+
+    if (block.level === 1) {
+      return <h1 key={index} className={headingClass}>{renderInline(block.text)}</h1>;
+    }
+    if (block.level === 2) {
+      return <h2 key={index} className={headingClass}>{renderInline(block.text)}</h2>;
+    }
+    return <h3 key={index} className={headingClass}>{renderInline(block.text)}</h3>;
+  }
+
+  if (block.type === "blockquote") {
+    return (
+      <blockquote
+        key={index}
+        className="border-l-4 border-[#7427b3] py-2 pl-8 text-2xl italic leading-10 text-[#707070] dark:text-white/65"
+      >
+        {renderInline(block.text)}
+      </blockquote>
+    );
+  }
+
+  if (block.type === "ul") {
+    return (
+      <ul key={index} className="space-y-3 pl-0">
+        {block.items.map((item) => (
+          <li key={item} className="flex gap-3">
+            <span className="mt-4 size-2 rounded-full bg-[#7427b3]" />
+            <span>{renderInline(item)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (block.type === "ol") {
+    return (
+      <ol key={index} className="space-y-3 pl-0">
+        {block.items.map((item, itemIndex) => (
+          <li key={`${itemIndex}-${item}`} className="flex gap-4">
+            <span className="mt-1 inline-flex min-w-8 justify-center rounded-full bg-[#f1e8f8] px-2 py-1 text-base font-bold text-[#7427b3]">
+              {itemIndex + 1}
+            </span>
+            <span>{renderInline(item)}</span>
+          </li>
+        ))}
+      </ol>
+    );
+  }
+
+  if (block.type === "alignment") {
+    const alignClass =
+      block.align === "center"
+        ? "text-center"
+        : block.align === "right"
+          ? "text-right"
+          : "text-left";
+
+    return (
+      <div key={index} className={alignClass}>
+        <div className="space-y-6">
+          {parseBlocks(block.content).map((nestedBlock, nestedIndex) =>
+            renderBlock(nestedBlock, nestedIndex),
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return <p key={index}>{renderInline(block.text)}</p>;
+}
+
 export default function MarkdownContent({
   content,
   className = "",
@@ -173,65 +272,7 @@ export default function MarkdownContent({
 
   return (
     <div className={`space-y-6 text-xl leading-9 text-[#4f4f4f] dark:text-white/75 ${className}`}>
-      {blocks.map((block, index) => {
-        if (block.type === "heading") {
-          const headingClass =
-            block.level === 1
-              ? "text-4xl font-black leading-tight text-[#191919] dark:text-white"
-              : block.level === 2
-                ? "text-3xl font-bold text-[#191919] dark:text-white"
-                : "text-2xl font-bold text-[#191919] dark:text-white";
-
-          if (block.level === 1) {
-            return <h1 key={index} className={headingClass}>{renderInline(block.text)}</h1>;
-          }
-          if (block.level === 2) {
-            return <h2 key={index} className={headingClass}>{renderInline(block.text)}</h2>;
-          }
-          return <h3 key={index} className={headingClass}>{renderInline(block.text)}</h3>;
-        }
-
-        if (block.type === "blockquote") {
-          return (
-            <blockquote
-              key={index}
-              className="border-l-4 border-[#7427b3] py-2 pl-8 text-2xl italic leading-10 text-[#707070] dark:text-white/65"
-            >
-              {renderInline(block.text)}
-            </blockquote>
-          );
-        }
-
-        if (block.type === "ul") {
-          return (
-            <ul key={index} className="space-y-3 pl-0">
-              {block.items.map((item) => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-4 size-2 rounded-full bg-[#7427b3]" />
-                  <span>{renderInline(item)}</span>
-                </li>
-              ))}
-            </ul>
-          );
-        }
-
-        if (block.type === "ol") {
-          return (
-            <ol key={index} className="space-y-3 pl-0">
-              {block.items.map((item, itemIndex) => (
-                <li key={`${itemIndex}-${item}`} className="flex gap-4">
-                  <span className="mt-1 inline-flex min-w-8 justify-center rounded-full bg-[#f1e8f8] px-2 py-1 text-base font-bold text-[#7427b3]">
-                    {itemIndex + 1}
-                  </span>
-                  <span>{renderInline(item)}</span>
-                </li>
-              ))}
-            </ol>
-          );
-        }
-
-        return <p key={index}>{renderInline(block.text)}</p>;
-      })}
+      {blocks.map((block, index) => renderBlock(block, index))}
     </div>
   );
 }
