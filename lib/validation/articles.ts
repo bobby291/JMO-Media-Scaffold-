@@ -23,6 +23,7 @@ export const articleCreateSchema = z.object({
   slug: z.string().trim().min(4).max(100).optional(),
   excerpt: z.string().trim().max(500).optional(),
   content: z.string().trim().min(20),
+  authorBio: z.string().trim().max(500).optional(),
   coverImage: z.string().url().optional(),
   type: z.enum(articleTypes).default("ARTICLE"),
   status: z.enum(articleStatuses).default("DRAFT"),

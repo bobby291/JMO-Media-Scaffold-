@@ -146,7 +146,7 @@ export async function syncStaticArticles(authorId: string) {
 
   const categoryIdByName = new Map(categories.map((category) => [category.name, category.id]));
   const existing = await prisma.article.findMany({
-    select: { slug: true },
+    select: { slug: true, authorBio: true },
     where: { slug: { in: featuredArticles.map((article) => article.slug) } },
   });
   const existingSlugs = new Set(existing.map((article) => article.slug));
@@ -158,6 +158,7 @@ export async function syncStaticArticles(authorId: string) {
       slug: article.slug,
       excerpt: article.excerpt,
       content: staticArticleToMarkdown(article),
+      authorBio: article.authorBio,
       coverImage: article.image,
       type: "ARTICLE" as const,
       status: "PUBLISHED" as const,
@@ -166,14 +167,26 @@ export async function syncStaticArticles(authorId: string) {
       categoryId: categoryIdByName.get(article.area) ?? null,
     }));
 
-  if (!missingArticles.length) {
-    return;
+  if (missingArticles.length) {
+    await prisma.article.createMany({
+      data: missingArticles,
+      skipDuplicates: true,
+    });
   }
 
-  await prisma.article.createMany({
-    data: missingArticles,
-    skipDuplicates: true,
-  });
+  await Promise.all(
+    featuredArticles.map((article) =>
+      prisma.article.updateMany({
+        where: {
+          slug: article.slug,
+          OR: [{ authorBio: null }, { authorBio: "" }],
+        },
+        data: {
+          authorBio: article.authorBio,
+        },
+      }),
+    ),
+  );
 }
 
 export async function getUnifiedPublishedArticlePreviews(limit = 50) {

@@ -91,6 +91,7 @@ export async function PATCH(request: Request, { params }: Params) {
         slug: payload.slug ? slugify(payload.slug) : undefined,
         excerpt: payload.excerpt,
         content: payload.content,
+        authorBio: payload.authorBio,
         coverImage: payload.coverImage,
         type: payload.type,
         status: nextStatus,

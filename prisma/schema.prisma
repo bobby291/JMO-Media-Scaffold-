@@ -109,6 +109,7 @@ model Article {
   slug        String        @unique
   excerpt     String?
   content     String
+  authorBio   String?
   coverImage  String?
   type        ArticleType   @default(ARTICLE)
   status      ArticleStatus @default(DRAFT)

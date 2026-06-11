@@ -243,8 +243,9 @@ export default async function ArticleDetailPage({
             <div>
               <h2 className="text-3xl font-bold">About {author}</h2>
               <p className="mt-4 text-xl leading-9 text-[#707070] dark:text-white/65">
-                {fallback?.authorBio ??
+                {article?.authorBio ??
                   article?.author.bio ??
+                  fallback?.authorBio ??
                   `${author} contributes practical insight for the JMO Media community.`}
               </p>
             </div>

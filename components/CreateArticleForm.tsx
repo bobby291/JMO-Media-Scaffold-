@@ -70,6 +70,7 @@ export default function CreateArticleForm({
         title: form.get("title"),
         excerpt: form.get("excerpt"),
         content: form.get("content"),
+        authorBio: form.get("authorBio") || undefined,
         coverImage: form.get("coverImage") || undefined,
         type: form.get("type"),
         status: form.get("status"),
@@ -135,6 +136,19 @@ export default function CreateArticleForm({
           minLength={20}
           placeholder="Write the article body here. Use the toolbar to format headings, lists, quotes, and links."
         />
+
+        <label className="block font-semibold">
+          About author
+          <textarea
+            name="authorBio"
+            maxLength={500}
+            className="mt-2 min-h-24 w-full resize-none rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#191919]"
+            placeholder="Optional article-specific author blurb shown in the About Author section."
+          />
+          <span className="mt-2 block text-xs font-medium text-[#707070] dark:text-white/55">
+            Overrides the default profile bio for this article only.
+          </span>
+        </label>
 
         <label className="block font-semibold">
           Cover image URL

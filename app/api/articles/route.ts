@@ -63,6 +63,7 @@ export async function POST(request: Request) {
         slug,
         excerpt: payload.excerpt,
         content: payload.content,
+        authorBio: payload.authorBio,
         coverImage: payload.coverImage,
         type: payload.type,
         status,

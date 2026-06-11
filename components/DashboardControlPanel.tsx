@@ -89,6 +89,7 @@ type DashboardArticle = {
   title: string;
   excerpt: string | null;
   content: string;
+  authorBio: string | null;
   coverImage: string | null;
   status: ArticleStatus;
   type: ArticleType;
@@ -112,7 +113,15 @@ type DashboardArticle = {
 
 type EditableArticle = Pick<
   DashboardArticle,
-  "slug" | "title" | "excerpt" | "content" | "coverImage" | "type" | "status" | "categoryId"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "content"
+  | "authorBio"
+  | "coverImage"
+  | "type"
+  | "status"
+  | "categoryId"
 >;
 
 type DashboardMediaAsset = {
@@ -497,6 +506,7 @@ export default function DashboardControlPanel({
         title: form.get("title"),
         excerpt: form.get("excerpt") || undefined,
         content: form.get("content"),
+        authorBio: form.get("authorBio") || undefined,
         coverImage: form.get("coverImage") || undefined,
         type: form.get("type"),
         status: form.get("status"),
@@ -1432,6 +1442,7 @@ export default function DashboardControlPanel({
                               title: article.title,
                               excerpt: article.excerpt,
                               content: article.content,
+                              authorBio: article.authorBio,
                               coverImage: article.coverImage,
                               type: article.type,
                               status: article.status,
@@ -2104,6 +2115,27 @@ export default function DashboardControlPanel({
                 minLength={20}
                 placeholder="Use the toolbar to format article content."
               />
+
+              <label className="block font-semibold">
+                About author
+                <textarea
+                  name="authorBio"
+                  value={activeArticle.authorBio ?? ""}
+                  onChange={(event) =>
+                    setActiveArticle((current) =>
+                      current
+                        ? {
+                            ...current,
+                            authorBio: event.target.value,
+                          }
+                        : current,
+                    )
+                  }
+                  maxLength={500}
+                  className="mt-2 min-h-24 w-full rounded-xl border border-[#d7d7d7] px-4 py-3 outline-none focus:border-[#7427b3] dark:border-white/10 dark:bg-[#111]"
+                  placeholder="Article-specific author blurb shown in the About Author section."
+                />
+              </label>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block font-semibold">

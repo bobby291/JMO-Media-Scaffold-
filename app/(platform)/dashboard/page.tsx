@@ -268,6 +268,7 @@ export default async function DashboardPage() {
           title: article.title,
           excerpt: article.excerpt,
           content: article.content,
+          authorBio: article.authorBio,
           coverImage: article.coverImage,
           status: article.status,
           type: article.type,
