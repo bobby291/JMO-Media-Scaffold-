@@ -47,6 +47,7 @@ export default function JoinPage() {
   const interestTitles = developmentAreas.map((area) => area.title);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [conflictEmail, setConflictEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [joinedName, setJoinedName] = useState("");
@@ -77,6 +78,7 @@ export default function JoinPage() {
     const form = new FormData(formElement);
     const interests = selectedInterests;
     const name = String(form.get("name") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim().toLowerCase();
 
     try {
       const response = await fetch("/api/community/join", {
@@ -84,7 +86,7 @@ export default function JoinPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          email: form.get("email"),
+          email,
           password: form.get("password"),
           interests,
         }),
@@ -94,6 +96,9 @@ export default function JoinPage() {
       setLoading(false);
 
       if (!response.ok) {
+        if (response.status === 409) {
+          setConflictEmail(email);
+        }
         setError(body?.error ?? "Unable to join the community");
         return;
       }
@@ -101,6 +106,7 @@ export default function JoinPage() {
       formElement.reset();
       setSelectedInterests([]);
       setJoinedName(name);
+      setConflictEmail("");
       setMessage(
         body?.message ??
           `Thank you for joining our community, ${name}. Your reader access is ready and you can now sign in to comment on posts.`,
@@ -311,9 +317,25 @@ export default function JoinPage() {
               </p>
             ) : null}
             {error ? (
-              <p className="mt-7 rounded-2xl bg-red-50 px-5 py-4 text-lg font-bold text-red-700">
-                {error}
-              </p>
+              <div className="mt-7 rounded-2xl bg-red-50 px-5 py-4 text-lg font-bold text-red-700">
+                <p>{error}</p>
+                {conflictEmail ? (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link
+                      href="/login"
+                      className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#7427b3] px-5 text-base font-black text-white transition hover:bg-[#5d1f92]"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href={`/forgot-password?email=${encodeURIComponent(conflictEmail)}`}
+                      className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[#7427b3] px-5 text-base font-black text-[#7427b3] transition hover:bg-[#f6effb]"
+                    >
+                      Reset password
+                    </Link>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
 
             <button

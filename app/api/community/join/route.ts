@@ -44,15 +44,19 @@ export async function POST(request: Request) {
       },
     });
 
+    if (existingUser && existingUser.role !== "READER") {
+      return fail(
+        "This email already has a platform access account. Sign in with that account or use password reset instead of joining the community again.",
+        409,
+      );
+    }
+
     const user = existingUser
       ? await prisma.user.update({
           where: { email: payload.email },
           data: {
             name: payload.name,
-            passwordHash:
-              existingUser.role === "READER" && !existingUser.passwordHash
-                ? passwordHash
-                : undefined,
+            passwordHash,
             emailVerified: existingUser.emailVerified ?? new Date(),
           },
           select: {
