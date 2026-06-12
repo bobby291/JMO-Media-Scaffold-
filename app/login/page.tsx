@@ -22,21 +22,21 @@ export default function LoginPage() {
     setLoading(true);
 
     const form = new FormData(event.currentTarget);
-    const dashboardUrl = `${window.location.origin}/dashboard`;
+    const appUrl = `${window.location.origin}/`;
     let result;
 
     try {
       result = await signIn("credentials", {
         email: form.get("email"),
         password: form.get("password"),
-        callbackUrl: dashboardUrl,
+        callbackUrl: appUrl,
         redirect: false,
       });
     } catch (error) {
       setLoading(false);
 
       if (error instanceof TypeError && error.message.includes("Invalid URL")) {
-        window.location.assign("/dashboard");
+        window.location.assign("/");
         return;
       }
 
@@ -70,7 +70,7 @@ export default function LoginPage() {
       }
     }
 
-    router.replace("/dashboard");
+    router.replace("/");
     router.refresh();
   }
 
@@ -97,8 +97,8 @@ export default function LoginPage() {
             Continue shaping the newsroom.
           </h1>
           <p className="mt-8 max-w-xl text-2xl leading-10 text-white/90">
-            Sign in to access your role-based workspace, publish stories if you
-            are an editor, or manage the platform if you are an admin.
+            Sign in to read, comment, manage your profile, or access editorial
+            tools based on the role already assigned to your account.
           </p>
         </div>
       </section>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             <div>
               <h2 className="text-5xl font-black tracking-tight">Sign in</h2>
               <p className="mt-2 text-lg text-[#4f5d75] dark:text-white/65">
-                Access your JMO Media workspace.
+                Access your JMO Media account and role-based features.
               </p>
             </div>
           </div>

@@ -102,11 +102,11 @@ Detailed release checklist:
 - `/forgot-password` - Password reset request page.
 - `/reset-password` - Password reset completion page.
 - `/verify-email` - Email verification and resend flow.
-- `/join` - Public JMO Community signup with benefits and interest selection.
-- `/signup` - Staff/dashboard registration page with contributor, editor, and admin role selection.
+- `/join` - Public JMO Community signup that creates Reader access plus community interests.
+- `/signup` - Platform access registration page for Contributor onboarding. Editor access is assigned by admins.
 - `/dashboard` - Editorial dashboard placeholder.
 - `/news`, `/editorials`, `/media` - Content-type entry pages.
-- Community and newsletter signup posts to `/api/newsletter` and stores email, name, and selected interests in the database.
+- Community signup posts to `/api/community/join`, stores interests, and provisions Reader access.
 
 ## Frontend Sections
 
@@ -156,14 +156,15 @@ Detailed release checklist:
 - `GET /api/admin/comments` lists moderation items for admins.
 - `PATCH /api/admin/comments/:id` approves or returns a comment to moderation.
 - `DELETE /api/admin/comments/:id` deletes a moderated comment.
-- `POST /api/newsletter` stores or updates a community/newsletter subscription with optional name and interests.
+- `POST /api/community/join` stores or updates community interests and creates Reader access.
 
 ## Roles
 
-- `READER`: basic reading access.
-- `CONTRIBUTOR`: read, share, comment, and maintain a contributor profile.
-- `EDITOR`: create, edit, review, and publish content plus manage the media library.
-- `ADMIN`: full platform control including user management, comment moderation, categories, analytics, and publishing.
+- `READER`: created from Join Community; can sign in, read, share, and comment on published posts.
+- `CONTRIBUTOR`: created from platform signup; can access a contributor profile and approved platform workspace.
+- `EDITOR`: assigned by admins; can create, edit, review, publish content, and manage the media library.
+- `ADMIN`: full platform control including user management, comment moderation, categories, analytics, publishing, and role reassignment.
+- `READER`: created from community join; can sign in, manage a reader profile, and comment on published posts.
 
 ## Database
 

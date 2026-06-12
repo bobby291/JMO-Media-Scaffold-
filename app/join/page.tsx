@@ -7,6 +7,9 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
+  Eye,
+  EyeOff,
+  Lock,
   Mail,
   Sparkles,
   TrendingUp,
@@ -47,6 +50,7 @@ export default function JoinPage() {
   const [loading, setLoading] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [joinedName, setJoinedName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const allSelected =
     interestTitles.length > 0 && selectedInterests.length === interestTitles.length;
@@ -81,6 +85,7 @@ export default function JoinPage() {
         body: JSON.stringify({
           name,
           email: form.get("email"),
+          password: form.get("password"),
           interests,
         }),
       });
@@ -98,7 +103,7 @@ export default function JoinPage() {
       setJoinedName(name);
       setMessage(
         body?.message ??
-          `Thank you for joining our community, ${name}. Check your email for next steps and exclusive content.`,
+          `Thank you for joining our community, ${name}. Your reader access is ready and you can now sign in to comment on posts.`,
       );
     } catch {
       setLoading(false);
@@ -120,15 +125,24 @@ export default function JoinPage() {
               Welcome to JMO Media!
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-9 text-[#707070] dark:text-white/65 md:text-2xl">
-              Thank you for joining our community{joinedName ? `, ${joinedName}` : ""}. Check your
-              email for next steps and exclusive content.
+              Thank you for joining our community{joinedName ? `, ${joinedName}` : ""}. Your
+              Reader access is ready. Sign in any time to comment on posts and follow the
+              conversation.
             </p>
-            <Link
-              href="/"
-              className="mt-10 inline-flex min-h-16 items-center justify-center rounded-2xl bg-[#7427b3] px-10 text-xl font-black text-white shadow-[0_16px_34px_rgba(116,39,179,0.28)] transition hover:-translate-y-0.5 hover:bg-[#5d1f92]"
-            >
-              Back to Home
-            </Link>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/login"
+                className="inline-flex min-h-16 items-center justify-center rounded-2xl bg-[#7427b3] px-10 text-xl font-black text-white shadow-[0_16px_34px_rgba(116,39,179,0.28)] transition hover:-translate-y-0.5 hover:bg-[#5d1f92]"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex min-h-16 items-center justify-center rounded-2xl border border-[#7427b3] px-10 text-xl font-black text-[#7427b3] transition hover:bg-[#f6effb]"
+              >
+                Back to Home
+              </Link>
+            </div>
           </div>
         </section>
       </main>
@@ -191,6 +205,9 @@ export default function JoinPage() {
             className="animate-jmo-fade-up rounded-[28px] border border-[#dedede] bg-white p-8 shadow-[0_24px_80px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#222] md:p-12"
           >
             <h2 className="text-4xl font-black tracking-tight">Create Your Account</h2>
+            <p className="mt-3 text-lg leading-8 text-[#707070] dark:text-white/65">
+              Join community creates a Reader account. Readers can sign in, read, and comment on posts.
+            </p>
 
             <div className="mt-10 space-y-7">
               <label className="block text-xl font-black">
@@ -220,6 +237,30 @@ export default function JoinPage() {
                     placeholder="john@example.com"
                     className="w-full bg-transparent text-2xl text-[#191919] outline-none placeholder:text-[#777] dark:text-white"
                   />
+                </span>
+              </label>
+
+              <label className="block text-xl font-black">
+                Password
+                <span className="mt-3 flex min-h-20 items-center gap-4 rounded-2xl border border-[#d8d8d8] bg-white px-6 transition focus-within:border-[#7427b3] focus-within:ring-4 focus-within:ring-[#7427b3]/10 dark:border-white/15 dark:bg-[#111]">
+                  <Lock size={25} className="text-[#7427b3]" />
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    placeholder="Create a password"
+                    className="w-full bg-transparent text-2xl text-[#191919] outline-none placeholder:text-[#777] dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((value) => !value)}
+                    className="grid size-10 place-items-center rounded-xl text-[#4f5d75] transition hover:bg-[#f1e8f8] hover:text-[#7427b3] dark:text-white/70"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+                  </button>
                 </span>
               </label>
 

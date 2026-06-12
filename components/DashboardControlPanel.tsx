@@ -224,7 +224,11 @@ function roleSummary(role: UserRole) {
   }
 
   if (role === "CONTRIBUTOR") {
-    return "Read, share, comment, and maintain a contributor profile.";
+    return "Platform contributor access with profile management and approved workspace participation.";
+  }
+
+  if (role === "READER") {
+    return "Community reader access with sign-in, reading, sharing, and commenting on published posts.";
   }
 
   return "Read-only access across the platform.";

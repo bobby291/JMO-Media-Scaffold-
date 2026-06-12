@@ -34,7 +34,7 @@ export default async function DashboardPage() {
           <div className="rounded-2xl border border-[#e4e4e4] bg-white p-8 dark:border-white/10 dark:bg-[#222]">
             <h2 className="text-2xl font-bold">Authentication required</h2>
             <p className="mt-3 text-[#707070] dark:text-white/65">
-              Login or create an account to access the contributor, editor, or admin workspace.
+              Login to access your Reader, Contributor, Editor, or Admin account area.
             </p>
             <div className="mt-6 flex gap-3">
               <Link href="/login" className="rounded-xl bg-[#7427b3] px-5 py-3 font-semibold text-white">
@@ -234,14 +234,18 @@ export default async function DashboardPage() {
               ? "Admin control panel"
               : role === "EDITOR"
                 ? "Editorial control panel"
-                : "Contributor workspace"}
+                : role === "CONTRIBUTOR"
+                  ? "Contributor workspace"
+                  : "Reader workspace"}
           </p>
           <h1 className="mt-5 text-5xl font-bold leading-tight md:text-7xl">
             {role === "ADMIN"
               ? "Manage the platform and publishing workflow."
               : role === "EDITOR"
                 ? "Create, review, and publish content."
-                : "Track your role profile and platform activity."}
+                : role === "CONTRIBUTOR"
+                  ? "Track your role profile and platform activity."
+                  : "Read, comment, and manage your community profile."}
           </h1>
           <p className="mt-6 max-w-4xl text-xl leading-9 text-white/85">
             Role-based access is enforced through NextAuth sessions, Prisma-backed APIs, and platform permissions.

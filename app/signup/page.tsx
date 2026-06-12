@@ -11,19 +11,13 @@ const roles = [
   {
     value: "CONTRIBUTOR",
     label: "Contributor",
-    description: "Read, share, comment, and access a contributor profile inside the platform.",
+    description: "Access the platform workspace with a contributor profile and approved participation privileges.",
     publicAccess: true,
   },
   {
     value: "EDITOR",
     label: "Editor",
     description: "Create, edit, post, and publish articles, news, editorials, and media content.",
-    publicAccess: false,
-  },
-  {
-    value: "ADMIN",
-    label: "Admin",
-    description: "Manage platform operations, users, categories, and editorial activity.",
     publicAccess: false,
   },
 ];
@@ -95,7 +89,7 @@ export default function SignupPage() {
                 Create Platform Access Account
               </h1>
               <p className="mt-3 text-lg leading-8 text-[#4f5d75] dark:text-white/65">
-                Public signup creates Contributor access. Editor and Admin roles are issued internally to approved business email accounts.
+                Platform signup creates Contributor access. Editor access is assigned internally by an administrator to approved business email accounts.
               </p>
             </div>
           </div>
@@ -170,7 +164,7 @@ export default function SignupPage() {
                 Dashboard role
               </legend>
               <p className="mt-3 text-sm font-semibold leading-6 text-[#68758a] dark:text-white/55">
-                Public registration is limited to Contributor. Editorial and Admin access are assigned internally after verification.
+                Public registration is limited to Contributor. Editor access is assigned internally by an administrator after verification.
               </p>
               <div className="mt-3 grid gap-3">
                 {roles.map((role) => (
@@ -262,8 +256,8 @@ export default function SignupPage() {
             Build stories with clear publishing roles.
           </h2>
           <p className="mt-8 text-2xl leading-10 text-white/90">
-            Contributors follow, read, and share. Editors create and publish content.
-            Admins manage the platform. Community members still join from the public page.
+            Contributors access the platform workspace. Editors create and publish content.
+            Community members join from the public page as Readers, and only admins can change roles.
           </p>
         </div>
       </section>
