@@ -45,6 +45,14 @@ export async function POST(request: Request) {
     });
 
     if (existingUser && existingUser.role !== "READER") {
+      console.info("Community join blocked by existing platform account", {
+        email: payload.email,
+        existingRole: existingUser.role,
+        hasPassword: Boolean(existingUser.passwordHash),
+        emailVerified: Boolean(existingUser.emailVerified),
+        requestOrigin: new URL(request.url).origin,
+      });
+
       return fail(
         "This email already has a platform access account. Sign in with that account or use password reset instead of joining the community again.",
         409,
@@ -81,6 +89,14 @@ export async function POST(request: Request) {
             role: true,
           },
         });
+
+    console.info("Community reader access saved", {
+      email: payload.email,
+      userId: user.id,
+      role: user.role,
+      existingReaderUpdated: Boolean(existingUser),
+      requestOrigin: new URL(request.url).origin,
+    });
 
     return ok(
       {

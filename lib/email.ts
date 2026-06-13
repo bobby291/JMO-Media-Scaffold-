@@ -48,7 +48,7 @@ export async function sendTransactionalEmail(payload: EmailPayload) {
     throw new EmailDeliveryError("Resend rejected the email request", result.error);
   }
 
-  return { skipped: false };
+  return { skipped: false, result };
 }
 
 export function verificationEmailContent(email: string, token: string, request?: Request) {

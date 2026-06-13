@@ -20,6 +20,10 @@ const providers: NonNullable<NextAuthOptions["providers"]> = [
       const parsed = loginSchema.safeParse(credentials);
 
       if (!parsed.success || !hasDatabaseUrl()) {
+        console.info("Credentials login rejected before lookup", {
+          reason: !parsed.success ? "invalid_payload" : "missing_database_url",
+        });
+
         return null;
       }
 
@@ -28,14 +32,34 @@ const providers: NonNullable<NextAuthOptions["providers"]> = [
       });
 
       if (!user?.passwordHash) {
+        console.info("Credentials login rejected after lookup", {
+          email: parsed.data.email,
+          reason: user ? "missing_password_hash" : "user_not_found",
+          role: user?.role ?? null,
+          emailVerified: Boolean(user?.emailVerified),
+        });
+
         return null;
       }
 
       const isValid = await bcrypt.compare(parsed.data.password, user.passwordHash);
 
       if (!isValid) {
+        console.info("Credentials login rejected after password check", {
+          email: parsed.data.email,
+          reason: "invalid_password",
+          role: user.role,
+          emailVerified: Boolean(user.emailVerified),
+        });
+
         return null;
       }
+
+      console.info("Credentials login accepted", {
+        email: parsed.data.email,
+        role: user.role,
+        emailVerified: Boolean(user.emailVerified),
+      });
 
       return {
         id: user.id,
